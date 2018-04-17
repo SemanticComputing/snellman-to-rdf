@@ -6,7 +6,7 @@ from rdflib import Graph, Literal, namespace, Namespace, XSD
 g = Graph()
 snellman = Namespace('http://ldf.fi/snellman/')
 g.bind('skos', namespace.SKOS)
-dc = Namespace('http://purl.org/dc/')
+dc = Namespace('http://purl.org/dc/elements/1.1/')
 g.bind('dc', dc)
 g.bind('foaf', namespace.FOAF)
 
@@ -99,7 +99,6 @@ def add_to_graph(elem):
     document = snellman[elem.find('nid').text]
     g.add((document, namespace.RDF.type, snellman.SnellmanTeksti))
     g.add((document, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
-#    if len(list(elem.find('alias'))):
     path = elem.find('path')
     g.add((document, namespace.RDFS.comment, Literal('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
     add_people(elem, document)
