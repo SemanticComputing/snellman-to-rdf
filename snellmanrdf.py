@@ -95,17 +95,31 @@ def add_relations(elem, s, field):
     for resource in field:
         g.add((s, dc.relation, snellman[resource[0].text]))
 
+# Adding some extra properties to the letters. Unfinished...   
+def add_letter_properties(elem, s):
+    if len(list(elem.find('field_kirjeenvaihto'))):
+        full_title = elem.find('title').text
+        title = full_title.split(",")[0]
+        if title[len(title)-1] == 'a' or title[len(title)-1] == 'ä':
+            people = elem.find('field_henkilot')
+            if len(list(people)):
+                g.add((s, namespace.RDFS.seeAlso, snellman[people[0][0][0].text]))
+            places = elem.find('field_paikat')
+            if len(list(places)):
+                g.add((s, namespace.RDFS.seeAlso, snellman[places[0][0][0].text]))
+
 def add_to_graph(elem):
-    document = snellman[elem.find('nid').text]
-    g.add((document, namespace.RDF.type, snellman.SnellmanTeksti))
-    g.add((document, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
+    s = snellman[elem.find('nid').text]
+    g.add((s, namespace.RDF.type, snellman.SnellmanTeksti))
+    g.add((s, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
     path = elem.find('path')
-    g.add((document, namespace.RDFS.comment, Literal('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
-    add_people(elem, document)
-    add_places(elem, document)
-    add_concepts(elem, document)
-    add_type(elem, document)
-    add_time(elem, document)
+    g.add((s, namespace.RDFS.comment, Literal('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
+    add_people(elem, s)
+    add_places(elem, s)
+    add_concepts(elem, s)
+    add_type(elem, s)
+    add_time(elem, s)
+    add_letter_properties(elem, s)
 
 def add_export():
     g.add((snellman.SnellmanTeksti, namespace.RDF.type, namespace.RDFS.Class))
