@@ -1,14 +1,19 @@
 import xml.etree.ElementTree as ET
 import csv
 import re
-from rdflib import Graph, Literal, namespace, Namespace, XSD
+from rdflib import Graph, Literal, namespace, Namespace, XSD, URIRef
 
+# The target graph and some bindings
 g = Graph()
 snellman = Namespace('http://ldf.fi/snellman/')
 g.bind('skos', namespace.SKOS)
 dc = Namespace('http://purl.org/dc/elements/1.1/')
 g.bind('dc', dc)
 g.bind('foaf', namespace.FOAF)
+
+# loadind YSO-paikat graph
+yso_g = Graph()
+yso_g.parse('graphs/yso-paikat-skos.rdf')
 
 
 # Methods for the csv-files
@@ -44,6 +49,18 @@ def add_paikat_csv():
         s = snellman[row[0]]
         g.add((s, namespace.RDF.type, snellman.Paikka))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1])))
+        add_links_to_paikka(s, row[1])
+        
+def add_links_to_paikka(s, place):
+    location = Literal(place, lang='fi')
+    q = yso_g.query("""
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT ?s
+            WHERE { ?s skos:prefLabel ?label . }
+            """, initBindings={'label': location})
+    for row in q:
+        g.add((s, namespace.SKOS.exactMatch, URIRef(row[0])))
+    # some places need to be linked by hand...
         
 def add_kirjeenvaihto_csv():
     g.add((snellman.Kirjeenvaihto, namespace.RDF.type, namespace.RDFS.Class))
