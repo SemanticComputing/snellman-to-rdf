@@ -10,10 +10,15 @@ g.bind('skos', namespace.SKOS)
 dc = Namespace('http://purl.org/dc/elements/1.1/')
 g.bind('dc', dc)
 g.bind('foaf', namespace.FOAF)
+#dbo = Namespace('http://dbpedia.org/resource/classes#')
+dbo = Namespace('http://dbpedia.org/ontology/')
+g.bind('dbo', dbo)
 
 # loadind YSO-paikat graph
 yso_g = Graph()
 yso_g.parse('graphs/yso-paikat-skos.rdf')
+
+
 
 
 # Methods for the csv-files
@@ -39,8 +44,20 @@ def add_henkilot_csv():
             words = row[9].split(' ')
             g.add((s, namespace.FOAF.familyName, Literal(words[len(words)-1])))
         cleanr = re.compile('<.*?>')
-        g.add((s, namespace.RDFS.comment, Literal(re.sub(cleanr, '', row[12]))))
+        bio = re.sub(cleanr, '', row[12])
+        if len(list(bio)):
+            g.add((s, namespace.RDFS.comment, Literal(bio)))
+            # Adding birth and death years. Death years sometimes problematic...
+            if bio[0].isdigit():
+                biosplit = bio.split('–')
+                if len(list(biosplit)):
+                    if len(biosplit[0]) == 4:
+                        g.add((s, dbo.birthYear, Literal(biosplit[0], datatype=XSD.gyear)))
+                        death = biosplit[1].split('.')[0].split(',')[0].split(' ')[0].split('/')[0].split('?')[0].split('e')[0]
+                        if len(list(death)):
+                            g.add((s, dbo.deathYear, Literal(death, datatype=XSD.gyear)))
 
+        
 def add_paikat_csv():
     g.add((snellman.Paikka, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.Paikka, namespace.SKOS.prefLabel, Literal('Paikka')))
@@ -79,6 +96,8 @@ def add_tyypit_csv():
         s = snellman[row[0]]
         g.add((s, namespace.RDF.type, snellman.Dokumenttityyppi))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1])))
+
+
 
 
 # Methods for export.xml
@@ -146,7 +165,10 @@ def add_export():
                 if elem.find('type').text == 'tekstilahde':
                     add_to_graph(elem)
 
+
+
 ################
+
 
 add_aiheet_csv()
 add_henkilot_csv()
