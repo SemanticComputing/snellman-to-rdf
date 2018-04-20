@@ -24,29 +24,29 @@ yso_g.parse('graphs/yso-paikat-skos.rdf')
 # Methods for the csv-files
 
 def add_aiheet_csv():
-    g.add((snellman.Aihe, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.Aihe, namespace.SKOS.prefLabel, Literal('Aihe, Subject')))
+    g.add((snellman.Subject, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.Subject, namespace.SKOS.prefLabel, Literal('Aihe, Subject')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_5.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]
-        g.add((s, namespace.RDF.type, snellman.Aihe))
-        g.add((s, namespace.SKOS.prefLabel, Literal(row[1])))
+        g.add((s, namespace.RDF.type, snellman.Subject))
+        g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
         
 def add_henkilot_csv():
     csv_reader = csv.reader(open('taxonomy/taxocsv_10.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]
         g.add((s, namespace.RDF.type, namespace.FOAF.Person))
-        g.add((s, namespace.SKOS.prefLabel, Literal(row[1])))
+        g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
         if row[9]:
-            g.add((s, namespace.SKOS.altLabel, Literal(row[9])))
+            g.add((s, namespace.SKOS.altLabel, Literal(row[9], lang='fi')))
             # Following adds family name, but not correctly in every case.
             words = row[9].split(' ')
-            g.add((s, namespace.FOAF.familyName, Literal(words[len(words)-1])))
+            g.add((s, namespace.FOAF.familyName, Literal(words[len(words)-1], lang='fi')))
         cleanr = re.compile('<.*?>')
         bio = re.sub(cleanr, '', row[12])
         if len(list(bio)):
-            g.add((s, namespace.RDFS.comment, Literal(bio)))
+            g.add((s, namespace.RDFS.comment, Literal(bio, lang='fi')))
             # Adding birth and death years. Death years sometimes problematic...
             if bio[0].isdigit():
                 biosplit = bio.split('–')
@@ -59,13 +59,14 @@ def add_henkilot_csv():
 
         
 def add_paikat_csv():
-    g.add((snellman.Paikka, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.Paikka, namespace.SKOS.prefLabel, Literal('Paikka')))
+    g.add((snellman.Place, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.Place, namespace.SKOS.prefLabel, Literal('Paikka, place')))
+    g.add((snellman.Place, namespace.SKOS.exactMatch, dbo.Place))
     csv_reader = csv.reader(open('taxonomy/taxocsv_4.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]
-        g.add((s, namespace.RDF.type, snellman.Paikka))
-        g.add((s, namespace.SKOS.prefLabel, Literal(row[1])))
+        g.add((s, namespace.RDF.type, snellman.Place))
+        g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
         add_links_to_paikka(s, row[1])
         
 def add_links_to_paikka(s, place):
@@ -78,24 +79,24 @@ def add_links_to_paikka(s, place):
     for row in q:
         g.add((s, namespace.SKOS.exactMatch, URIRef(row[0])))
     # some places need to be linked by hand...
-        
+    
 def add_kirjeenvaihto_csv():
-    g.add((snellman.Kirjeenvaihto, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.Kirjeenvaihto, namespace.SKOS.prefLabel, Literal('Kirjeenvaihto')))
+    g.add((snellman.Correspondence, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.Correspondence, namespace.SKOS.prefLabel, Literal('Kirjeenvaihto, Correspondence')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_8.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]
-        g.add((s, namespace.RDF.type, snellman.Kirjeenvaihto))
-        g.add((s, namespace.SKOS.prefLabel, Literal(row[1])))
+        g.add((s, namespace.RDF.type, snellman.Correspondence))
+        g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
 
 def add_tyypit_csv():
-    g.add((snellman.Dokumenttityyppi, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.Dokumenttityyppi, namespace.SKOS.prefLabel, Literal('Dokumentin tyyppi')))
+    g.add((snellman.Doctype, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.Doctype, namespace.SKOS.prefLabel, Literal('Dokumentin tyyppi, document type')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_9.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]
-        g.add((s, namespace.RDF.type, snellman.Dokumenttityyppi))
-        g.add((s, namespace.SKOS.prefLabel, Literal(row[1])))
+        g.add((s, namespace.RDF.type, snellman.Doctype))
+        g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
 
 
 
@@ -146,7 +147,7 @@ def add_letter_properties(elem, s):
 
 def add_to_graph(elem):
     s = snellman[elem.find('nid').text]
-    g.add((s, namespace.RDF.type, snellman.SnellmanTeksti))
+    g.add((s, namespace.RDF.type, snellman.Text))
     g.add((s, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
     path = elem.find('path')
     g.add((s, namespace.RDFS.comment, Literal('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
@@ -158,7 +159,7 @@ def add_to_graph(elem):
     add_letter_properties(elem, s)
 
 def add_export():
-    g.add((snellman.SnellmanTeksti, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.Text, namespace.RDF.type, namespace.RDFS.Class))
     for event, elem in ET.iterparse('export.xml', events=("start", "end")):
         if event == 'end':
             if elem.tag == 'node':
