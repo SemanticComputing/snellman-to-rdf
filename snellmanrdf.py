@@ -147,7 +147,7 @@ def add_letter_properties(elem, s):
 
 def add_to_graph(elem):
     s = snellman[elem.find('nid').text]
-    g.add((s, namespace.RDF.type, snellman.Text))
+    g.add((s, namespace.RDF.type, snellman.Document))
     g.add((s, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
     path = elem.find('path')
     g.add((s, namespace.RDFS.comment, Literal('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
@@ -159,7 +159,7 @@ def add_to_graph(elem):
     add_letter_properties(elem, s)
 
 def add_export():
-    g.add((snellman.Text, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.Document, namespace.RDF.type, namespace.RDFS.Class))
     for event, elem in ET.iterparse('export.xml', events=("start", "end")):
         if event == 'end':
             if elem.tag == 'node':
@@ -177,6 +177,20 @@ add_paikat_csv()
 add_kirjeenvaihto_csv()
 add_tyypit_csv()
 add_export()
+
+
+
+
+
+# Adding stuff by hand
+
+#places
+g.add((snellman['13638'], namespace.SKOS.closeMatch, URIRef('http://finto.fi/yso-paikat/fi/page/p94466'))) #Nikolain kaupunki = Vaasa
+g.add((snellman['13221'], namespace.SKOS.closeMatch, URIRef('https://finto.fi/yso-paikat/fi/page/p94083'))) #Palo tässä ilmeisesti Alahärmän kylä (?)
+
+
+########
+
 g.serialize('snellman.ttl', format='turtle')
 
 
