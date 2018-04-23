@@ -148,17 +148,24 @@ def add_relations(elem, s, field):
         g.add((s, dc.relation, snellman[resource[0].text]))
 
 # Adding some extra properties to the letters. Unfinished...   
-def add_letter_properties(elem, s):
+def add_creator(elem, s):
     if len(list(elem.find('field_kirjeenvaihto'))):
         full_title = elem.find('title').text
         title = full_title.split(",")[0]
         if title[len(title)-1] == 'a' or title[len(title)-1] == 'ä':
             people = elem.find('field_henkilot')
             if len(list(people)):
-                g.add((s, namespace.RDFS.seeAlso, snellman[people[0][0][0].text]))
+                g.add((s, dc.creator, snellman[people[0][0][0].text]))
             places = elem.find('field_paikat')
             if len(list(places)):
                 g.add((s, namespace.RDFS.seeAlso, snellman[places[0][0][0].text]))
+        else:
+            g.add((s, dc.creator, snellman['1']))
+            places = elem.find('field_paikat')
+            if len(list(places)):
+                g.add((s, namespace.RDFS.seeAlso, snellman[places[0][0][0].text]))
+    else:
+        g.add((s, dc.creator, snellman['1']))
 
 def add_content(elem, s):
     content = elem.find('field_suomi')
@@ -176,12 +183,15 @@ def add_to_graph(elem):
     add_concepts(elem, s)
     add_type(elem, s)
     add_time(elem, s)
-    add_letter_properties(elem, s)
+    add_creator(elem, s)
     add_content(elem, s)
 
 def add_export():
     g.add((snellman.Document, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.Document, namespace.RDFS.label, Literal('Document')))
+    g.add((snellman.Document, namespace.OWL.equivalentClass, dc.Document))
     g.add((snellman.hasText, namespace.RDF.type, namespace.RDF.Property))
+    g.add((snellman.hasText, namespace.RDFS.label, Literal('Text property')))
     for event, elem in ET.iterparse('export.xml', events=("start", "end")):
         if event == 'end':
             if elem.tag == 'node':
