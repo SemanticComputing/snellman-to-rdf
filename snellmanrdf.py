@@ -36,27 +36,33 @@ def add_henkilot_csv():
     add_snellman()
     csv_reader = csv.reader(open('taxonomy/taxocsv_10.csv', 'r'))
     for row in csv_reader:
-        s = snellman[row[0]]
-        g.add((s, namespace.RDF.type, namespace.FOAF.Person))
-        g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
-        if row[9]:
-            g.add((s, namespace.SKOS.altLabel, Literal(row[9], lang='fi')))
-            # Following adds family name, but not correctly in every case.
-            words = row[9].split(' ')
-            g.add((s, namespace.FOAF.familyName, Literal(words[len(words)-1], lang='fi')))
-        cleanr = re.compile('<.*?>')
-        bio = re.sub(cleanr, '', row[12])
-        if len(list(bio)):
-            g.add((s, namespace.RDFS.comment, Literal(bio, lang='fi')))
-            # Adding birth and death years. Death years sometimes problematic...
-            if bio[0].isdigit():
-                biosplit = bio.split('–')
-                if len(list(biosplit)):
-                    if len(biosplit[0]) == 4:
-                        g.add((s, dbo.birthYear, Literal(biosplit[0], datatype=XSD.gyear)))
-                        death = biosplit[1].split('.')[0].split(',')[0].split(' ')[0].split('/')[0].split('?')[0].split('e')[0]
-                        if len(list(death)):
-                            g.add((s, dbo.deathYear, Literal(death, datatype=XSD.gyear)))
+        add_personal_info(row)
+
+def add_personal_info(row):        
+    s = snellman[row[0]]
+    g.add((s, namespace.RDF.type, namespace.FOAF.Person))
+    g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
+    if row[9]:
+        g.add((s, namespace.SKOS.altLabel, Literal(row[9], lang='fi')))
+        # Following adds family name, but not correctly in every case.
+        words = row[9].split(' ')
+        g.add((s, namespace.FOAF.familyName, Literal(words[len(words)-1], lang='fi')))
+    cleanr = re.compile('<.*?>')
+    bio = re.sub(cleanr, '', row[12])
+    if len(list(bio)):
+        add_bio(s, bio)
+
+def add_bio(s, bio):
+    g.add((s, namespace.RDFS.comment, Literal(bio, lang='fi')))
+    # Adding birth and death years. Death years sometimes problematic...
+    if bio[0].isdigit():
+        biosplit = bio.split('–')
+        if len(list(biosplit)):
+            if len(biosplit[0]) == 4:
+                g.add((s, dbo.birthYear, Literal(biosplit[0], datatype=XSD.gyear)))
+                death = biosplit[1].split('.')[0].split(',')[0].split(' ')[0].split('/')[0].split('?')[0].split('e')[0]
+                if len(list(death)):
+                    g.add((s, dbo.deathYear, Literal(death, datatype=XSD.gyear)))
 
 def add_snellman():
     s = snellman['1']
@@ -77,7 +83,7 @@ def add_paikat_csv():
         g.add((s, namespace.RDF.type, snellman.Place))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
 #   add_links_to_paikka(s, row[1])
-#   Liniking disabled        
+        
 def add_links_to_paikka(s, place):
     location = Literal(place, lang='fi')
     q = yso_g.query("""
