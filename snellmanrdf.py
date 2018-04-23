@@ -148,7 +148,9 @@ def add_relations(elem, s, field):
         g.add((s, dc.relation, snellman[resource[0].text]))
 
 # Adding some extra properties to the letters. Unfinished...   
+
 def add_creator(elem, s):
+
     if len(list(elem.find('field_kirjeenvaihto'))):
         full_title = elem.find('title').text
         title = full_title.split(",")[0]
@@ -166,6 +168,7 @@ def add_creator(elem, s):
                 g.add((s, namespace.RDFS.seeAlso, snellman[places[0][0][0].text]))
     else:
         g.add((s, dc.creator, snellman['1']))
+
 
 def add_content(elem, s):
     content = elem.find('field_suomi')
