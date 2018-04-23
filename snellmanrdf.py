@@ -2,10 +2,12 @@ import xml.etree.ElementTree as ET
 import csv
 import re
 from rdflib import Graph, Literal, namespace, Namespace, XSD, URIRef
+from bs4 import BeautifulSoup
 
 # The target graph and some bindings
 g = Graph()
 snellman = Namespace('http://ldf.fi/snellman/')
+g.bind('', snellman)
 g.bind('skos', namespace.SKOS)
 dc = Namespace('http://purl.org/dc/elements/1.1/')
 g.bind('dc', dc)
@@ -19,8 +21,6 @@ yso_g = Graph()
 yso_g.parse('graphs/yso-paikat-skos.rdf')
 
 
-
-
 # Methods for the csv-files
 
 def add_aiheet_csv():
@@ -31,8 +31,9 @@ def add_aiheet_csv():
         s = snellman[row[0]]
         g.add((s, namespace.RDF.type, snellman.Subject))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
-        
+
 def add_henkilot_csv():
+    add_snellman()
     csv_reader = csv.reader(open('taxonomy/taxocsv_10.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]
@@ -57,7 +58,15 @@ def add_henkilot_csv():
                         if len(list(death)):
                             g.add((s, dbo.deathYear, Literal(death, datatype=XSD.gyear)))
 
-        
+def add_snellman():
+    s = snellman['1']
+    g.add((s, namespace.RDF.type, namespace.FOAF.Person))
+    g.add((s, namespace.SKOS.prefLabel, Literal('J. V. Snellman', lang='fi')))
+    g.add((s, namespace.RDFS.comment, Literal('Poliitikko, filosofi, kirjailija, sanomalehtimies ja valtiomies. Suomen kansallisfilosofi.', lang='fi')))
+    g.add((s, namespace.FOAF.familyName, Literal('Snellman', lang='fi')))
+    g.add((s, dbo.birthyear, Literal('1806', datatype=XSD.gyear)))
+    g.add((s, dbo.deathyear, Literal('1881', datatype=XSD.gyear)))
+          
 def add_paikat_csv():
     g.add((snellman.Place, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.Place, namespace.SKOS.prefLabel, Literal('Paikka, place')))
@@ -67,8 +76,8 @@ def add_paikat_csv():
         s = snellman[row[0]]
         g.add((s, namespace.RDF.type, snellman.Place))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
-        add_links_to_paikka(s, row[1])
-        
+#   add_links_to_paikka(s, row[1])
+#   Liniking disabled        
 def add_links_to_paikka(s, place):
     location = Literal(place, lang='fi')
     q = yso_g.query("""
@@ -145,6 +154,11 @@ def add_letter_properties(elem, s):
             if len(list(places)):
                 g.add((s, namespace.RDFS.seeAlso, snellman[places[0][0][0].text]))
 
+def add_content(elem, s):
+    content = elem.find('field_suomi')
+    if len(list(content)):
+        g.add((s, snellman.hasText, Literal((BeautifulSoup(content[0][0][3].text,'lxml').text))))
+
 def add_to_graph(elem):
     s = snellman[elem.find('nid').text]
     g.add((s, namespace.RDF.type, snellman.Document))
@@ -157,9 +171,11 @@ def add_to_graph(elem):
     add_type(elem, s)
     add_time(elem, s)
     add_letter_properties(elem, s)
+    add_content(elem, s)
 
 def add_export():
     g.add((snellman.Document, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.hasText, namespace.RDF.type, namespace.RDF.Property))
     for event, elem in ET.iterparse('export.xml', events=("start", "end")):
         if event == 'end':
             if elem.tag == 'node':
