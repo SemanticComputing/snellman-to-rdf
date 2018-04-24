@@ -62,7 +62,8 @@ def add_bio(s, bio):
                 g.add((s, dbo.birthYear, Literal(biosplit[0], datatype=XSD.gyear)))
                 death = biosplit[1].split('.')[0].split(',')[0].split(' ')[0].split('/')[0].split('?')[0].split('e')[0]
                 if len(list(death)):
-                    g.add((s, dbo.deathYear, Literal(death, datatype=XSD.gyear)))
+                    if len(death) == 4:
+                        g.add((s, dbo.deathYear, Literal(death, datatype=XSD.gyear)))
 
 def add_snellman():
     s = snellman['1']
