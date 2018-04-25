@@ -215,16 +215,6 @@ add_tyypit_csv()
 add_export()
 
 
-
-
-
-# Adding stuff by hand
-
-#places
-g.add((snellman['13638'], namespace.SKOS.closeMatch, URIRef('http://finto.fi/yso-paikat/fi/page/p94466'))) #Nikolain kaupunki = Vaasa
-g.add((snellman['13221'], namespace.SKOS.closeMatch, URIRef('https://finto.fi/yso-paikat/fi/page/p94083'))) #Palo tässä ilmeisesti Alahärmän kylä (?)
-
-
 ########
 
 g.serialize('snellman.ttl', format='turtle')
