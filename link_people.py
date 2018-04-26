@@ -30,7 +30,6 @@ def link_people_wd(g):
         BIND(year(xsd:date(?wdbdate)) as ?wd_birth_year) .
         FILTER(?s_birth_year = ?wd_birth_year) .
         }
-        LIMIT 10
         '''
 
     response = requests.post('http://localhost:3030/ds/query',
