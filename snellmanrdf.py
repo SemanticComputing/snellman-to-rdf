@@ -33,11 +33,15 @@ def add_personal_info(g, row):
     s = snellman[row[0]]
     g.add((s, namespace.RDF.type, namespace.FOAF.Person))
     g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
+    name_split = row[1].split(',')
+    bracket_remover = re.compile('\(.*?\)')  
+    if len(name_split) > 1:
+        family_name = re.sub(bracket_remover, '', name_split[0]).strip()
+        g.add((s, namespace.FOAF.familyName, Literal(family_name, lang='fi')))
+        first_name = re.sub(bracket_remover, '', name_split[1]).strip()
+        g.add((s, namespace.FOAF.givenName, Literal(first_name, lang='fi')))
     if row[9]:
         g.add((s, namespace.SKOS.altLabel, Literal(row[9], lang='fi')))
-        # Following adds family name, but not correctly in every case.
-        words = row[9].split(' ')
-        g.add((s, namespace.FOAF.familyName, Literal(words[len(words)-1], lang='fi')))
     cleanr = re.compile('<.*?>')
     bio = re.sub(cleanr, '', row[12])
     if len(list(bio)):
@@ -62,8 +66,9 @@ def add_snellman(g):
     s = snellman['1']
     g.add((s, namespace.RDF.type, namespace.FOAF.Person))
     g.add((s, namespace.SKOS.prefLabel, Literal('J. V. Snellman', lang='fi')))
-    g.add((s, namespace.RDFS.comment, Literal('Poliitikko, filosofi, kirjailija, sanomalehtimies ja valtiomies. Suomen kansallisfilosofi.', lang='fi')))
+    g.add((s, namespace.RDFS.comment, Literal('Poliitikko, kirjailija, sanomalehtimies, valtiomies ja Suomen kansallisfilosofi.', lang='fi')))
     g.add((s, namespace.FOAF.familyName, Literal('Snellman', lang='fi')))
+    g.add((s, namespace.FOAF.givenName, Literal('Johan Vilhelm', lang='fi')))
     g.add((s, dbo.birthyear, Literal('1806', datatype=XSD.gyear)))
     g.add((s, dbo.deathyear, Literal('1881', datatype=XSD.gyear)))
     return g
