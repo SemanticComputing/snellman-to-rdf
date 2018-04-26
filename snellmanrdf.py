@@ -181,7 +181,7 @@ def add_to_graph(elem):
     g.add((s, namespace.RDF.type, snellman.Document))
     g.add((s, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
     path = elem.find('path')
-    g.add((s, namespace.RDFS.comment, Literal('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
+    g.add((s, namespace.dc.source, URIRef('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
     add_people(elem, s)
     add_places(elem, s)
     add_concepts(elem, s)

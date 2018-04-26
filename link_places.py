@@ -72,7 +72,7 @@ g.add((snellman['13638'], namespace.SKOS.closeMatch, URIRef('http://finto.fi/yso
 g.add((snellman['13638'], namespace.SKOS.closeMatch, snellman['13228'])) # Nikoilainkaupunki -> Vaasa
 g.add((snellman['13228'], namespace.SKOS.closeMatch, snellman['13638'])) # Vaasa -> Nikolainkaupunki
 g.add((snellman['13221'], namespace.SKOS.closeMatch, URIRef('https://finto.fi/yso-paikat/fi/page/p94083'))) #Palo tässä ilmeisesti Alahärmän kylä (?)
-g.add((snellman['13353'], namespace.SKOS.closeMatch, snellman['13221'])) # Palo -> Alahärmä
-g.add((snellman['13221'], namespace.SKOS.closeMatch, snellman['13353'])) # Alahärmä -> Palo
+g.add((snellman['13353'], namespace.SKOS.closeMatch, snellman['13221'])) # Alahärmä -> Palo
+g.add((snellman['13221'], namespace.SKOS.closeMatch, snellman['13353'])) # Palo -> Alahärmä
 
 g.serialize('snellman.ttl', format='turtle')
