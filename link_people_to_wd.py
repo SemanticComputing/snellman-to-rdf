@@ -35,9 +35,6 @@ def link_people_wd(g):
     response = requests.post('http://localhost:3030/ds/query',
                           data={'query': q})
     
-    file = open('graphs/plinkingpalt.json','w') 
-    file.write(response.text) 
-    
     for row in response.json()['results']['bindings']:
         g.add((URIRef(row['henkilo']['value']), namespace.SKOS.exactMatch, URIRef(row['human']['value'])))
 
@@ -73,9 +70,6 @@ def link_people_wd_prefLabel(g):
 
     response = requests.post('http://localhost:3030/ds/query',
                           data={'query': q})
-    
-    file = open('graphs/plinkingppref.json','w') 
-    file.write(response.text) 
     
     for row in response.json()['results']['bindings']:
         g.add((URIRef(row['henkilo']['value']), namespace.SKOS.exactMatch, URIRef(row['human']['value'])))
