@@ -11,6 +11,28 @@ dc = Namespace('http://purl.org/dc/elements/1.1/')
 
 # Methods for the csv-files
 
+def add_luvut_csv(g):
+    g.add((snellman.chapter, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.chapter, namespace.SKOS.prefLabel, Literal('Chapter, kirjan luku')))
+    csv_reader = csv.reader(open('taxonomy/taxocsv_13.csv', 'r'))
+    for row in csv_reader:
+        resource = snellman[row[0]]
+        g.add((resource, namespace.RDF.type, snellman.chapter))
+        g.add((resource, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
+    return g
+
+
+def add_kirjat_csv(g):
+    g.add((snellman.bioBook, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.bioBook, namespace.SKOS.prefLabel, Literal('Biograhical book, elamankerrallinen kirja')))
+    csv_reader = csv.reader(open('taxonomy/taxocsv_12.csv', 'r'))
+    for row in csv_reader:
+        resource = snellman[row[0]]
+        g.add((resource, namespace.RDF.type, snellman.bioBook))
+        g.add((resource, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
+    return g
+
+
 def add_aiheet_csv(g):
     g.add((snellman.Subject, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.Subject, namespace.SKOS.prefLabel, Literal('Aihe, Subject')))
@@ -330,12 +352,14 @@ content_graph.bind('dc', dc)
 content_graph.bind('foaf', namespace.FOAF)
 content_graph.bind('dbo', dbo)
 
-graph = add_aiheet_csv(graph)
-graph = add_henkilot_csv(graph)
-graph = add_paikat_csv(graph)
-graph = add_kirjeenvaihto_csv(graph)
-graph = add_tyypit_csv(graph)
-graph = add_export(graph, content_graph)
+add_aiheet_csv(graph)
+add_henkilot_csv(graph)
+add_paikat_csv(graph)
+add_kirjeenvaihto_csv(graph)
+add_tyypit_csv(graph)
+add_kirjat_csv(graph)
+add_luvut_csv(graph)
+add_export(graph, content_graph)
 
 graph.serialize('turtle/snellman.ttl', format='turtle')
 content_graph.serialize('turtle/snellman_content.ttl', format='turtle')
