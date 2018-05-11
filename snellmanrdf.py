@@ -319,6 +319,8 @@ def add_kirjan_luku(g_content, elem):
     if len(list(luku)):
         g_content.add((resource, dc.relation, snellman[luku[0][0][0].text]))
 
+
+# Adds this and some others: http://snellman.kootutteokset.fi/fi/node/6846
 def add_secondary_info(g_content,elem):
     resource = snellman['content/m' + elem.find('nid').text]
     g_content.add((resource, namespace.RDF.type, snellman.Material))
