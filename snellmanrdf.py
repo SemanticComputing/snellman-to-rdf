@@ -4,7 +4,6 @@ import re
 from rdflib import Graph, Literal, namespace, Namespace, XSD, URIRef
 from bs4 import BeautifulSoup
 
-
 snellman = Namespace('http://ldf.fi/snellman/')
 dbo = Namespace('http://dbpedia.org/ontology/')
 dc = Namespace('http://purl.org/dc/elements/1.1/')
@@ -22,6 +21,7 @@ def add_aiheet_csv(g):
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
     return g
 
+
 def add_henkilot_csv(g):
     add_snellman(g)
     csv_reader = csv.reader(open('taxonomy/taxocsv_10.csv', 'r'))
@@ -29,12 +29,13 @@ def add_henkilot_csv(g):
         add_personal_info(g, row)
     return g
 
+
 def add_personal_info(g, row):
     s = snellman[row[0]]
     g.add((s, namespace.RDF.type, namespace.FOAF.Person))
     g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
     name_split = row[1].split(',')
-    bracket_remover = re.compile('\(.*?\)')  
+    bracket_remover = re.compile('\(.*?\)')
     if len(name_split) > 1:
         family_name = re.sub(bracket_remover, '', name_split[0]).strip()
         g.add((s, namespace.FOAF.familyName, Literal(family_name, lang='fi')))
@@ -47,6 +48,7 @@ def add_personal_info(g, row):
     if len(list(bio)):
         add_bio(g, s, bio)
     return g
+
 
 def add_bio(g, s, bio):
     g.add((s, namespace.RDFS.comment, Literal(bio, lang='fi')))
@@ -62,6 +64,7 @@ def add_bio(g, s, bio):
                         g.add((s, dbo.deathYear, Literal(death, datatype=XSD.gyear)))
     return g
 
+
 def add_snellman(g):
     s = snellman['1']
     g.add((s, namespace.RDF.type, namespace.FOAF.Person))
@@ -72,7 +75,8 @@ def add_snellman(g):
     g.add((s, dbo.birthyear, Literal('1806', datatype=XSD.gyear)))
     g.add((s, dbo.deathyear, Literal('1881', datatype=XSD.gyear)))
     return g
-          
+
+
 def add_paikat_csv(g):
     g.add((snellman.Place, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.Place, namespace.SKOS.prefLabel, Literal('Paikka, place')))
@@ -83,8 +87,10 @@ def add_paikat_csv(g):
         g.add((s, namespace.RDF.type, snellman.Place))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
     return g
+
+
 #   add_links_to_paikka(s, row[1])
-        
+
 def add_links_to_paikka(g, s, place):
     yso_g = Graph()
     yso_g.parse('graphs/yso-paikat-skos.rdf')
@@ -98,7 +104,8 @@ def add_links_to_paikka(g, s, place):
         g.add((s, namespace.SKOS.exactMatch, URIRef(row[0])))
     return g
     # some places need to be linked by hand...
-    
+
+
 def add_kirjeenvaihto_csv(g):
     g.add((snellman.Correspondence, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.Correspondence, namespace.SKOS.prefLabel, Literal('Kirjeenvaihto, Correspondence')))
@@ -108,6 +115,7 @@ def add_kirjeenvaihto_csv(g):
         g.add((s, namespace.RDF.type, snellman.Correspondence))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
     return g
+
 
 def add_tyypit_csv(g):
     g.add((snellman.Doctype, namespace.RDF.type, namespace.RDFS.Class))
@@ -120,7 +128,6 @@ def add_tyypit_csv(g):
     return g
 
 
-
 # Methods for export.xml
 
 def add_people(g, elem, s):
@@ -128,44 +135,49 @@ def add_people(g, elem, s):
     if len(list(people)):
         add_relations(g, elem, s, people[0])
     return g
-              
+
+
 def add_places(g, elem, s):
     places = elem.find('field_paikat')
     if len(list(places)):
         add_relations(g, elem, s, places[0])
     return g
-        
+
+
 def add_concepts(g, elem, s):
     concepts = elem.find('field_asiat')
     if len(list(concepts)):
         add_relations(g, elem, s, concepts[0])
     return g
-        
+
+
 def add_type(g, elem, s):
     doctype = elem.find('field_dokumentin_tyyppi')
     if len(list(doctype)):
         g.add((s, namespace.RDF.type, snellman[doctype[0][0][0].text]))
     return g
-    
+
+
 def add_time(g, elem, s):
     time = elem.find('field_date')
     if len(list(time)):
         g.add((s, dc.date, Literal(time[0][0][0].text[:10], datatype=XSD.date)))
     return g
 
+
 def add_relations(g, elem, s, field):
     for resource in field:
         g.add((s, dc.relation, snellman[resource[0].text]))
     return g
 
-# Adding some extra properties to the letters. Unfinished...   
+
+# Adding some extra properties to the letters. Unfinished...
 
 def add_creator(g, elem, s):
-
     if len(list(elem.find('field_kirjeenvaihto'))):
         full_title = elem.find('title').text
         title = full_title.split(",")[0]
-        if title[len(title)-1] == 'a' or title[len(title)-1] == 'ä':
+        if title[len(title) - 1] == 'a' or title[len(title) - 1] == 'ä':
             people = elem.find('field_henkilot')
             if len(list(people)):
                 g.add((s, dc.creator, snellman[people[0][0][0].text]))
@@ -181,11 +193,13 @@ def add_creator(g, elem, s):
         g.add((s, dc.creator, snellman['1']))
     return g
 
+
 def add_content(g, elem, s):
     content = elem.find('field_suomi')
     if len(list(content)):
-        g.add((s, snellman.hasText, Literal((BeautifulSoup(content[0][0][3].text,'lxml').text))))
+        g.add((s, snellman.hasText, Literal(BeautifulSoup(content[0][0][3].text, 'lxml').text)))
     return g
+
 
 def add_document_to_graph(g, elem):
     s = snellman[elem.find('nid').text]
@@ -202,37 +216,63 @@ def add_document_to_graph(g, elem):
     g = add_content(g, elem, s)
     return g
 
-def add_export(g):
-    g.add((snellman.Document, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.Document, namespace.RDFS.label, Literal('Document')))
-    g.add((snellman.Document, namespace.OWL.equivalentClass, dc.Document))
+
+def add_basic_terms(g):
+    g.add((snellman.document, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.document, namespace.SKOS.prefLabel, Literal('Document')))
     g.add((snellman.hasText, namespace.RDF.type, namespace.RDF.Property))
-    g.add((snellman.hasText, namespace.RDFS.label, Literal('Text property')))
+    g.add((snellman.hasText, namespace.SKOS.prefLabel, Literal('Text property')))
+    g.add((snellman.material, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.hasText, namespace.SKOS.prefLabel, Literal('Biographic material')))
+    g.add((snellman.materialType, namespace.RDF.type, namespace.RDF.Property))
+
+
+def add_matrikkeli(g_content, elem):
+    resource = snellman['content/m' + elem.find('nid').text]
+    g_content.add((resource, namespace.RDF.type, snellman.Material))
+    content = elem.find('body')[0][0][0]
+    g_content.add((resource, snellman.hasText, Literal(BeautifulSoup(content.text, 'lxml').text)))
+
+
+def add_export(g, g_content):
+    add_basic_terms(g)
     for event, elem in ET.iterparse('export.xml', events=("start", "end")):
         if event == 'end':
             if elem.tag == 'node':
                 if elem.find('type').text == 'tekstilahde':
                     g = add_document_to_graph(g, elem)
+                else:
+                    if elem.find('type').text == 'matrikkeli':
+                        add_matrikkeli(g_content, elem)
+                        #print(ET.tostring(elem, encoding='utf8', method='xml'))
+
     return g
 
 
 ################
 
-g = Graph()
-g.bind('', snellman)
-g.bind('skos', namespace.SKOS)
-g.bind('dc', dc)
-g.bind('foaf', namespace.FOAF)
-g.bind('dbo', dbo)
+graph = Graph()
+content_graph = Graph()
+graph.bind('', snellman)
+graph.bind('skos', namespace.SKOS)
+graph.bind('dc', dc)
+graph.bind('foaf', namespace.FOAF)
+graph.bind('dbo', dbo)
 
-g = add_aiheet_csv(g)
-g = add_henkilot_csv(g)
-g = add_paikat_csv(g)
-g = add_kirjeenvaihto_csv(g)
-g = add_tyypit_csv(g)
-g = add_export(g)
+content_graph.bind('http://ldf.fi/snellman/', snellman)
+content_graph.bind('skos', namespace.SKOS)
+content_graph.bind('dc', dc)
+content_graph.bind('foaf', namespace.FOAF)
+content_graph.bind('dbo', dbo)
 
-g.serialize('snellman.ttl', format='turtle')
+graph = add_aiheet_csv(graph)
+graph = add_henkilot_csv(graph)
+graph = add_paikat_csv(graph)
+graph = add_kirjeenvaihto_csv(graph)
+graph = add_tyypit_csv(graph)
+graph = add_export(graph, content_graph)
 
+graph.serialize('turtle/snellman.ttl', format='turtle')
+content_graph.serialize('turtle/snellman_content.ttl', format='turtle')
 
 # To do: Adding the actual texts(?), more sensible classes etc...
