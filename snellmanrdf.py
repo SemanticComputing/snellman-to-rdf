@@ -293,8 +293,11 @@ def add_kirjallisuutta(g_content, elem):
         content = elem.find('body')[0][0][0]
         g_content.add((resource, snellman.hasText, Literal(BeautifulSoup(content.text, 'lxml').text)))
         g_content.add((resource, snellman.hasHTML, Literal(content.text)))
+        path = elem.find('path')
+        g_content.add((resource, dc.source, URIRef('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
     except:
         pass
+
 
 def add_kirjan_luku(g_content, elem):
     resource = snellman['content/m' + elem.find('nid').text]
@@ -305,6 +308,8 @@ def add_kirjan_luku(g_content, elem):
         content = elem.find('body')[0][0][0]
         g_content.add((resource, snellman.hasText, Literal(BeautifulSoup(content.text, 'lxml').text)))
         g_content.add((resource, snellman.hasHTML, Literal(content.text)))
+        path = elem.find('path')
+        g_content.add((resource, dc.source, URIRef('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
     except:
         pass
     kirja = elem.find('field_kirja')
@@ -313,6 +318,7 @@ def add_kirjan_luku(g_content, elem):
     luku = elem.find('field_ylaluku')
     if len(list(luku)):
         g_content.add((resource, dc.relation, snellman[luku[0][0][0].text]))
+
 
 def add_export(g, g_content):
     add_basic_terms(g)
