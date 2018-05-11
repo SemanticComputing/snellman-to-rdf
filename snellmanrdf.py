@@ -75,6 +75,14 @@ def add_personal_info(g, row):
 def add_bio(g, s, bio):
     g.add((s, namespace.RDFS.comment, Literal(bio, lang='fi')))
     # Adding birth and death years. Death years sometimes problematic...
+    bio = bio.replace("n.", "")
+    bio = bio.replace("n. ", "")
+    bio = bio.replace("synt. ", "")
+    bio = bio.replace("synt.", "")
+    bio = bio.replace("Synt.", "")
+    bio = bio.replace("Synt.", "")
+    bio = bio.strip()
+    #print(bio)
     if bio[0].isdigit():
         biosplit = bio.split('–')
         if len(list(biosplit)):
@@ -90,7 +98,8 @@ def add_bio(g, s, bio):
 def add_snellman(g):
     s = snellman['1']
     g.add((s, namespace.RDF.type, namespace.FOAF.Person))
-    g.add((s, namespace.SKOS.prefLabel, Literal('J. V. Snellman', lang='fi')))
+    g.add((s, namespace.SKOS.prefLabel, Literal('Snellman, Johan Vilhelm', lang='fi')))
+    g.add((s, namespace.SKOS.altLabel, Literal('J. V. Snellman', lang='fi')))
     g.add((s, namespace.RDFS.comment, Literal('Poliitikko, kirjailija, sanomalehtimies, valtiomies ja Suomen kansallisfilosofi.', lang='fi')))
     g.add((s, namespace.FOAF.familyName, Literal('Snellman', lang='fi')))
     g.add((s, namespace.FOAF.givenName, Literal('Johan Vilhelm', lang='fi')))
