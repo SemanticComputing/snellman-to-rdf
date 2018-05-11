@@ -260,7 +260,20 @@ def add_picture(g_content, elem):
     path = elem.find('path')
     g_content.add((resource, dc.source, URIRef('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
     add_time(g_content, elem, resource)
-    g_content.add((resource, dc.type, Literal('kuvalahde')))
+
+
+def add_kirjallisuutta(g_content, elem):
+    resource = snellman['content/m' + elem.find('nid').text]
+    g_content.add((resource, namespace.RDF.type, snellman.Material))
+    g_content.add((resource, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
+    g_content.add((resource, dc.type, Literal('kirjallisuutta')))
+    try:
+        content = elem.find('body')[0][0][0]
+        g_content.add((resource, snellman.hasText, Literal(BeautifulSoup(content.text, 'lxml').text)))
+        g_content.add((resource, snellman.hasHTML, Literal(content.text)))
+    except:
+        pass
+
 
 def add_export(g, g_content):
     add_basic_terms(g)
@@ -275,8 +288,12 @@ def add_export(g, g_content):
                 elif elem.find('type').text == 'kuvalahde':
                     add_picture(g_content, elem)
                     #print(ET.tostring(elem, encoding='utf8', method='xml'))
-                else:
-                    print(elem.find('type').text)
+                elif elem.find('type').text == 'kirjallisuutta':
+                    add_kirjallisuutta(g_content, elem)
+                    #print(ET.tostring(elem, encoding='utf8', method='xml'))
+
+#                else:
+#                    print(elem.find('type').text)
 
     return g
 
