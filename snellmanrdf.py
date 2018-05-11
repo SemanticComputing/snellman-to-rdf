@@ -249,7 +249,7 @@ def add_matrikkeli(g_content, elem):
     g_content.add((resource, dc.source, URIRef('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
     time = elem.find('field_pvm_alkean')
     if len(list(time)):
-        g.add((s, dc.date, Literal(time[0][0][0].text[:10], datatype=XSD.date)))
+        g_content.add((resource, dc.date, Literal(time[0][0][0].text[:10], datatype=XSD.date)))
 
 
 def add_picture(g_content, elem):
