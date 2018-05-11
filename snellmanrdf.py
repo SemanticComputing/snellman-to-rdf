@@ -194,15 +194,19 @@ def add_creator(g, elem, s):
     return g
 
 
-def add_content(g, elem, s):
+def add_content(g, elem, s, g_content, id):
     content = elem.find('field_suomi')
+    c_resource = snellman['content/c' + id]
     if len(list(content)):
-        g.add((s, snellman.hasText, Literal(BeautifulSoup(content[0][0][3].text, 'lxml').text)))
+        g.add((s, snellman.hasContent, c_resource))
+        g_content.add((c_resource, snellman.hasText, Literal(BeautifulSoup(content[0][0][3].text, 'lxml').text)))
+        g_content.add((c_resource, snellman.hasHTML, Literal(content[0][0][3].text)))
     return g
 
 
-def add_document_to_graph(g, elem):
-    s = snellman[elem.find('nid').text]
+def add_document_to_graph(g, elem, g_content):
+    document_id = elem.find('nid').text
+    s = snellman[document_id]
     g.add((s, namespace.RDF.type, snellman.Document))
     g.add((s, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
     path = elem.find('path')
@@ -213,15 +217,21 @@ def add_document_to_graph(g, elem):
     g = add_type(g, elem, s)
     g = add_time(g, elem, s)
     g = add_creator(g, elem, s)
-    g = add_content(g, elem, s)
+    g = add_content(g, elem, s, g_content, document_id)
     return g
 
 
 def add_basic_terms(g):
     g.add((snellman.document, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.document, namespace.SKOS.prefLabel, Literal('Document')))
+    g.add((snellman.content, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.content, namespace.SKOS.prefLabel, Literal('Resource for document content')))
+    g.add((snellman.hasContent, namespace.RDF.type, namespace.RDF.Property))
+    g.add((snellman.hasContent, namespace.SKOS.prefLabel, Literal('Link to content resource')))
     g.add((snellman.hasText, namespace.RDF.type, namespace.RDF.Property))
-    g.add((snellman.hasText, namespace.SKOS.prefLabel, Literal('Text property')))
+    g.add((snellman.hasText, namespace.SKOS.prefLabel, Literal('Content as text')))
+    g.add((snellman.hasHTML, namespace.RDF.type, namespace.RDF.Property))
+    g.add((snellman.hasHTML, namespace.SKOS.prefLabel, Literal('Content in HTML-format')))
     g.add((snellman.material, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.hasText, namespace.SKOS.prefLabel, Literal('Biographic material')))
     g.add((snellman.materialType, namespace.RDF.type, namespace.RDF.Property))
@@ -232,6 +242,7 @@ def add_matrikkeli(g_content, elem):
     g_content.add((resource, namespace.RDF.type, snellman.Material))
     content = elem.find('body')[0][0][0]
     g_content.add((resource, snellman.hasText, Literal(BeautifulSoup(content.text, 'lxml').text)))
+    g_content.add((resource, snellman.hasHTML, Literal(content.text)))
 
 
 def add_export(g, g_content):
@@ -240,7 +251,7 @@ def add_export(g, g_content):
         if event == 'end':
             if elem.tag == 'node':
                 if elem.find('type').text == 'tekstilahde':
-                    g = add_document_to_graph(g, elem)
+                    g = add_document_to_graph(g, elem, g_content)
                 else:
                     if elem.find('type').text == 'matrikkeli':
                         add_matrikkeli(g_content, elem)
@@ -259,7 +270,7 @@ graph.bind('dc', dc)
 graph.bind('foaf', namespace.FOAF)
 graph.bind('dbo', dbo)
 
-content_graph.bind('http://ldf.fi/snellman/', snellman)
+content_graph.bind('snell', snellman)
 content_graph.bind('skos', namespace.SKOS)
 content_graph.bind('dc', dc)
 content_graph.bind('foaf', namespace.FOAF)
