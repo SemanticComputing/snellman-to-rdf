@@ -274,6 +274,23 @@ def add_kirjallisuutta(g_content, elem):
     except:
         pass
 
+def add_kirjan_luku(g_content, elem):
+    resource = snellman['content/m' + elem.find('nid').text]
+    g_content.add((resource, namespace.RDF.type, snellman.Material))
+    g_content.add((resource, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
+    g_content.add((resource, dc.type, Literal('kirjan_luku')))
+    try:
+        content = elem.find('body')[0][0][0]
+        g_content.add((resource, snellman.hasText, Literal(BeautifulSoup(content.text, 'lxml').text)))
+        g_content.add((resource, snellman.hasHTML, Literal(content.text)))
+    except:
+        pass
+    kirja = elem.find('field_kirja')
+    if len(list(kirja)):
+        g_content.add((resource, dc.relation, snellman[kirja[0][0][0].text]))
+    luku = elem.find('field_ylaluku')
+    if len(list(luku)):
+        g_content.add((resource, dc.relation, snellman[luku[0][0][0].text]))
 
 def add_export(g, g_content):
     add_basic_terms(g)
@@ -284,16 +301,15 @@ def add_export(g, g_content):
                     g = add_document_to_graph(g, elem, g_content)
                 elif elem.find('type').text == 'matrikkeli':
                     add_matrikkeli(g_content, elem)
-                    #print(ET.tostring(elem, encoding='utf8', method='xml'))
                 elif elem.find('type').text == 'kuvalahde':
                     add_picture(g_content, elem)
-                    #print(ET.tostring(elem, encoding='utf8', method='xml'))
                 elif elem.find('type').text == 'kirjallisuutta':
                     add_kirjallisuutta(g_content, elem)
+                elif elem.find('type').text == 'kirjan_luku':
+                    add_kirjan_luku(g_content, elem)
                     #print(ET.tostring(elem, encoding='utf8', method='xml'))
-
-#                else:
-#                    print(elem.find('type').text)
+                else:
+                    print(elem.find('type').text)
 
     return g
 
