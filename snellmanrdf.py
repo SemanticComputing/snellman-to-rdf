@@ -319,6 +319,19 @@ def add_kirjan_luku(g_content, elem):
     if len(list(luku)):
         g_content.add((resource, dc.relation, snellman[luku[0][0][0].text]))
 
+def add_secondary_info(g_content,elem):
+    resource = snellman['content/m' + elem.find('nid').text]
+    g_content.add((resource, namespace.RDF.type, snellman.Material))
+    g_content.add((resource, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
+    g_content.add((resource, dc.type, Literal('tietoa')))
+    try:
+        content = elem.find('body')[0][0][0]
+        g_content.add((resource, snellman.hasText, Literal(BeautifulSoup(content.text, 'lxml').text)))
+        g_content.add((resource, snellman.hasHTML, Literal(content.text)))
+        g_content.add((resource, dc.source, URIRef('http://snellman.kootutteokset.fi/fi/node/{}'.format(elem.find('nid').text))))
+    except:
+        pass
+
 
 def add_export(g, g_content):
     add_basic_terms(g)
@@ -335,6 +348,8 @@ def add_export(g, g_content):
                     add_kirjallisuutta(g_content, elem)
                 elif elem.find('type').text == 'kirjan_luku':
                     add_kirjan_luku(g_content, elem)
+                elif elem.find('type').text == 'secondary_highlights':
+                    add_secondary_info(g_content, elem)
                     #print(ET.tostring(elem, encoding='utf8', method='xml'))
                 else:
                     print(elem.find('type').text)
@@ -369,5 +384,3 @@ add_export(graph, content_graph)
 
 graph.serialize('turtle/snellman.ttl', format='turtle')
 content_graph.serialize('turtle/snellman_content.ttl', format='turtle')
-
-# To do: Adding the actual texts(?), more sensible classes etc...
