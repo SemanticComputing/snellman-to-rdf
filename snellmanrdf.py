@@ -4,6 +4,7 @@ import re
 from rdflib import Graph, Literal, namespace, Namespace, XSD, URIRef
 from bs4 import BeautifulSoup
 import people_to_correspondence
+from string import digits
 
 snellman = Namespace('http://ldf.fi/snellman/')
 dbo = Namespace('http://dbpedia.org/ontology/')
@@ -202,7 +203,7 @@ def link_by_label(g, correspondent, letter_resource):
             g.add((letter_resource, dc.relation, person_resource))
             return True
 
-# "Borgström, Henrik nuorempi" menee ilmeisesti väärin...
+
 def link_by_name(g, correspondent, letter_resource):
     csv_reader = csv.reader(open('taxonomy/taxocsv_10.csv', 'r'))
     split_name = correspondent.split(' ')
@@ -281,24 +282,43 @@ def add_relations(g, elem, s, field):
 
 def add_creator(g, elem, s):
     if len(list(elem.find('field_kirjeenvaihto'))):
-        full_title = elem.find('title').text
-        title = full_title.split(",")[0]
-        if title[len(title) - 1] == 'a' or title[len(title) - 1] == 'ä':
-            people = elem.find('field_henkilot')
-            if len(list(people)):
-                g.add((s, dc.creator, snellman[people[0][0][0].text]))
-            places = elem.find('field_paikat')
-            if len(list(places)):
-                g.add((s, namespace.RDFS.seeAlso, snellman[places[0][0][0].text]))
-        else:
-            g.add((s, dc.creator, snellman['1']))
-            places = elem.find('field_paikat')
-            if len(list(places)):
-                g.add((s, namespace.RDFS.seeAlso, snellman[places[0][0][0].text]))
+        add_letter_sender(g, elem, s)
+        places = elem.find('field_paikat')
+        if len(list(places)):
+            g.add((s, namespace.RDFS.seeAlso, snellman[places[0][0][0].text]))
     else:
         g.add((s, dc.creator, snellman['1']))
     return g
 
+
+# vieläkin virheitä, ainakin "Johan Jakob Nervanderilta 1833"
+def add_letter_sender(g, elem, s):
+    full_title = elem.find('title').text
+    title = full_title.split(",")[0]
+    remove_digits = str.maketrans('', '', digits)
+    no_dig_title = title.translate(remove_digits)
+    if (no_dig_title[len(no_dig_title) - 1] == 'a' or no_dig_title[len(no_dig_title) - 1] == 'ä') and no_dig_title[len(no_dig_title) - 2] == 't':
+        people = elem.find('field_henkilot')
+        if len(list(people)):
+            g.add((s, dc.creator, snellman[people[0][0][0].text]))
+    else:
+        g.add((s, dc.creator, snellman['1']))
+
+def get_correspondent(g, elem, s):
+    correspondent = elem.find('field_kirjeenvaihto')[0][0][0].text
+    q = g.query("""
+            PREFIX snell: <http://ldf.fi/snellman/>
+            PREFIX dc: <http://purl.org/dc/elements/1.1/>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT ?person
+            WHERE {
+                ?s a snell:Correspondence .
+                ?s skos:prefLabel ?label .
+                ?s dc:relation ?person .
+             }
+            """, initBindings={'label': correspondent})
+    for row in q:
+        g.add((s, dc.creator, URIRef(row[0])))
 
 def add_content(g, elem, s, g_content, id):
     content = elem.find('field_suomi')
