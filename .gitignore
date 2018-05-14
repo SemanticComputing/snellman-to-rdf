@@ -4,3 +4,5 @@ export.xml
 graphs/
 turtle/
 snellman.ttl
+__pycache__/
+*.pyc

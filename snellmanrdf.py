@@ -3,6 +3,7 @@ import csv
 import re
 from rdflib import Graph, Literal, namespace, Namespace, XSD, URIRef
 from bs4 import BeautifulSoup
+import people_to_correspondence
 
 snellman = Namespace('http://ldf.fi/snellman/')
 dbo = Namespace('http://dbpedia.org/ontology/')
@@ -162,6 +163,7 @@ def add_kirjeenvaihto_csv(g):
         g.add((s, namespace.RDF.type, snellman.Correspondence))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
         link_correspondence_to_people(g, row, s)
+    people_to_correspondence.connect(g)
     return g
 
 
@@ -185,7 +187,8 @@ def link_correspondence_to_people(g, correspondent, letter_resource):
         #print(correspondent)
         x=1
     else:
-        print(correspondent[1])
+        #print(correspondent[1])
+        x=1
 
 
 def link_by_label(g, correspondent, letter_resource):
@@ -261,6 +264,12 @@ def add_time(g, elem, s):
         g.add((s, dc.date, Literal(time[0][0][0].text[:10], datatype=XSD.date)))
     return g
 
+def add_correspondence(g, elem, s):
+    correspondent = elem.find('field_kirjeenvaihto')
+    if len(list(correspondent)):
+        g.add((s, dc.relation, snellman[correspondent[0][0][0].text]))
+    return g
+
 
 def add_relations(g, elem, s, field):
     for resource in field:
@@ -315,6 +324,7 @@ def add_document_to_graph(g, elem, g_content):
     g = add_time(g, elem, s)
     g = add_creator(g, elem, s)
     g = add_content(g, elem, s, g_content, document_id)
+    g = add_correspondence(g, elem, s)
     return g
 
 
