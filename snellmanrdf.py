@@ -72,6 +72,21 @@ def add_personal_info(g, row):
         add_bio(g, s, bio)
     return g
 
+def first_name(name):
+    name_split = name.split(',')
+    bracket_remover = re.compile('\(.*?\)')
+    if len(name_split) > 1:
+        return re.sub(bracket_remover, '', name_split[1]).strip()
+    else:
+        return ''
+
+def family_name(name):
+    name_split = name.split(',')
+    bracket_remover = re.compile('\(.*?\)')
+    if len(name_split) > 1:
+        return re.sub(bracket_remover, '', name_split[0]).strip()
+    else:
+        return ''
 
 def add_bio(g, s, bio):
     g.add((s, namespace.RDFS.comment, Literal(bio, lang='fi')))
@@ -146,6 +161,7 @@ def add_kirjeenvaihto_csv(g):
         s = snellman[row[0]]
         g.add((s, namespace.RDF.type, snellman.Correspondence))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
+        link_correspondence_to_people(g, row, s)
     return g
 
 
@@ -160,9 +176,54 @@ def add_tyypit_csv(g):
     return g
 
 
+def link_correspondence_to_people(g, correspondent, letter_resource):
+    #print(surname)
+    if link_by_label(g, correspondent[1], letter_resource):
+        #print(correspondent)
+        x=1
+    elif link_by_name(g, correspondent[1], letter_resource):
+        #print(correspondent)
+        x=1
+    else:
+        print(correspondent[1])
 
 
+def link_by_label(g, correspondent, letter_resource):
+    csv_reader = csv.reader(open('taxonomy/taxocsv_10.csv', 'r'))
+    for row in csv_reader:
+        person_resource = snellman[row[0]]
+        if row[9] == correspondent:
+            g.add((letter_resource, dc.relation, person_resource))
+            return True
+        elif row[1] == correspondent:
+            g.add((letter_resource, dc.relation, person_resource))
+            return True
 
+# "Borgström, Henrik nuorempi" menee ilmeisesti väärin...
+def link_by_name(g, correspondent, letter_resource):
+    csv_reader = csv.reader(open('taxonomy/taxocsv_10.csv', 'r'))
+    split_name = correspondent.split(' ')
+    if len(split_name) > 1:
+        surname = split_name[len(split_name)-1]
+        first_names = return_first_names_from_split(split_name)
+        for row in csv_reader:
+            person_resource = snellman[row[0]]
+            if (first_name(row[1]).split(' ')[0].strip() == first_names.strip()) and (family_name(row[1]) == surname):
+                g.add((letter_resource, dc.relation, person_resource))
+                return True
+            if first_name(row[1]).strip() == first_names.strip() and family_name(row[1]) == surname:
+                g.add((letter_resource, dc.relation, person_resource))
+                return True
+    return False
+
+
+def return_first_names_from_split(name):
+    first_names = ''
+    x=0
+    while x < len(name)-1:
+        first_names = first_names + ' ' + name[x]
+        x = x+1
+    return first_names
 
 # Methods for export.xml
 
@@ -273,6 +334,8 @@ def add_basic_terms(g):
     g.add((snellman.materialType, namespace.RDF.type, namespace.RDF.Property))
     g.add((snellman.actor, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.actor, namespace.SKOS.prefLabel, Literal('Actor, toimija')))
+    g.add((snellman.letterSender, namespace.RDF.type, namespace.RDF.Property))
+    g.add((snellman.letterSender, namespace.SKOS.prefLabel, Literal('Sender of the letter, kirjeen lahettaja')))
 
 
 def add_matrikkeli(g_content, elem):
@@ -369,8 +432,8 @@ def add_export(g, g_content):
                 elif elem.find('type').text == 'secondary_highlights':
                     add_secondary_info(g_content, elem)
                     #print(ET.tostring(elem, encoding='utf8', method='xml'))
-                else:
-                    print(elem.find('type').text)
+                #else:
+                #    print(elem.find('type').text)
 
     return g
 
