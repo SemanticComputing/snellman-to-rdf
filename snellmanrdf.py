@@ -54,6 +54,7 @@ def add_henkilot_csv(g):
 
 def add_personal_info(g, row):
     s = snellman[row[0]]
+    g.add((s, namespace.RDF.type, snellman.Actor))
     g.add((s, namespace.RDF.type, namespace.FOAF.Person))
     g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
     name_split = row[1].split(',')
@@ -157,6 +158,10 @@ def add_tyypit_csv(g):
         g.add((s, namespace.RDF.type, snellman.Doctype))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
     return g
+
+
+
+
 
 
 # Methods for export.xml
@@ -266,6 +271,8 @@ def add_basic_terms(g):
     g.add((snellman.material, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.hasText, namespace.SKOS.prefLabel, Literal('Biographic material')))
     g.add((snellman.materialType, namespace.RDF.type, namespace.RDF.Property))
+    g.add((snellman.actor, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.actor, namespace.SKOS.prefLabel, Literal('Actor, toimija')))
 
 
 def add_matrikkeli(g_content, elem):
