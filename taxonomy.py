@@ -182,14 +182,11 @@ def add_tyypit_csv(g):
 def link_correspondence_to_people(g, correspondent, letter_resource):
     #print(surname)
     if link_by_label(g, correspondent[1], letter_resource):
-        #print(correspondent)
-        x=1
+        pass
     elif link_by_name(g, correspondent[1], letter_resource):
-        #print(correspondent)
-        x=1
+        pass
     else:
-        #print(correspondent[1])
-        x=1
+        pass
 
 
 def link_by_label(g, correspondent, letter_resource):

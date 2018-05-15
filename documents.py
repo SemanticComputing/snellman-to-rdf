@@ -78,14 +78,11 @@ def add_letter_sender(g, elem, s):
     remove_digits = str.maketrans('', '', digits)
     no_dig_title = title.translate(remove_digits).strip()
     if (no_dig_title[len(no_dig_title) - 1] == 'a' or no_dig_title[len(no_dig_title) - 1] == 'ä') and no_dig_title[len(no_dig_title) - 2] == 't':
-        #people = elem.find('field_henkilot')
-        #if len(list(people)):
-        #    g.add((s, dc.creator, snellman[people[0][0][0].text]))
-        get_correspondent(g, elem, s)
+        set_correspondent(g, elem, s)
     else:
         g.add((s, dc.creator, snellman['1']))
 
-def get_correspondent(g, elem, s):
+def set_correspondent(g, elem, s):
     correspondent = elem.find('field_kirjeenvaihto')[0][0][0].text
     q = g.query("""
             PREFIX snell: <http://ldf.fi/snellman/>
@@ -114,6 +111,12 @@ def add_content(g, elem, s, g_content, id):
         g_content.add((c_resource, snellman.hasHTML, Literal(content[0][0][3].text)))
     return g
 
+def add_date_comment(g, elem, s):
+    date_comment = elem.find('field_pvm_kommenti')
+    if len(list(date_comment)):
+        g.add((s, snellman.dateComment, Literal(date_comment[0][0][0].text)))
+    return g
+
 
 def add_document_to_graph(g, elem, g_content):
     document_id = elem.find('nid').text
@@ -127,30 +130,12 @@ def add_document_to_graph(g, elem, g_content):
     g = add_concepts(g, elem, s)
     g = add_type(g, elem, s)
     g = add_time(g, elem, s)
+    g = add_date_comment(g, elem, s)
     g = add_creator(g, elem, s)
     g = add_content(g, elem, s, g_content, document_id)
     g = add_correspondence(g, elem, s)
     return g
 
-
-def add_basic_terms(g):
-    g.add((snellman.document, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.document, namespace.SKOS.prefLabel, Literal('Document')))
-    g.add((snellman.content, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.content, namespace.SKOS.prefLabel, Literal('Resource for document content')))
-    g.add((snellman.hasContent, namespace.RDF.type, namespace.RDF.Property))
-    g.add((snellman.hasContent, namespace.SKOS.prefLabel, Literal('Link to content resource')))
-    g.add((snellman.hasText, namespace.RDF.type, namespace.RDF.Property))
-    g.add((snellman.hasText, namespace.SKOS.prefLabel, Literal('Content as text')))
-    g.add((snellman.hasHTML, namespace.RDF.type, namespace.RDF.Property))
-    g.add((snellman.hasHTML, namespace.SKOS.prefLabel, Literal('Content in HTML-format')))
-    g.add((snellman.material, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.hasText, namespace.SKOS.prefLabel, Literal('Biographic material')))
-    g.add((snellman.materialType, namespace.RDF.type, namespace.RDF.Property))
-    g.add((snellman.actor, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.actor, namespace.SKOS.prefLabel, Literal('Actor, toimija')))
-    g.add((snellman.letterSender, namespace.RDF.type, namespace.RDF.Property))
-    g.add((snellman.letterSender, namespace.SKOS.prefLabel, Literal('Sender of the letter, kirjeen lahettaja')))
 
 
 def add_matrikkeli(g_content, elem):
@@ -215,7 +200,7 @@ def add_kirjan_luku(g_content, elem):
 
 
 # Adds this and some others: http://snellman.kootutteokset.fi/fi/node/6846
-def add_secondary_info(g_content,elem):
+def add_secondary_info(g_content, elem):
     resource = snellman['content/m' + elem.find('nid').text]
     g_content.add((resource, namespace.RDF.type, snellman.Material))
     g_content.add((resource, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
@@ -230,7 +215,6 @@ def add_secondary_info(g_content,elem):
 
 
 def add_export(g, g_content):
-    add_basic_terms(g)
     for event, elem in ET.iterparse('export.xml', events=("start", "end")):
         if event == 'end':
             if elem.tag == 'node':

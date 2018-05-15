@@ -8,6 +8,9 @@ dc = Namespace('http://purl.org/dc/elements/1.1/')
 def connect(g):
     #   g.add((snellman[''], dc.relation, snellman['']))
 
+    # Anton von Schiefner
+    g.add((snellman['13550'], dc.relation, snellman['12257']))
+
     # Borgström, Henrik nuorempi -> Borgström, Henrik vanhempi
     g.remove((snellman['13476'], dc.relation, snellman['9392']))
     g.add((snellman['13476'], dc.relation, snellman['9393']))
