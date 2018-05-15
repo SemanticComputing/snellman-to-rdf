@@ -296,11 +296,12 @@ def add_letter_sender(g, elem, s):
     full_title = elem.find('title').text
     title = full_title.split(",")[0]
     remove_digits = str.maketrans('', '', digits)
-    no_dig_title = title.translate(remove_digits)
+    no_dig_title = title.translate(remove_digits).strip()
     if (no_dig_title[len(no_dig_title) - 1] == 'a' or no_dig_title[len(no_dig_title) - 1] == 'ä') and no_dig_title[len(no_dig_title) - 2] == 't':
-        people = elem.find('field_henkilot')
-        if len(list(people)):
-            g.add((s, dc.creator, snellman[people[0][0][0].text]))
+        #people = elem.find('field_henkilot')
+        #if len(list(people)):
+        #    g.add((s, dc.creator, snellman[people[0][0][0].text]))
+        get_correspondent(g, elem, s)
     else:
         g.add((s, dc.creator, snellman['1']))
 
@@ -312,13 +313,17 @@ def get_correspondent(g, elem, s):
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT ?person
             WHERE {
-                ?s a snell:Correspondence .
-                ?s skos:prefLabel ?label .
-                ?s dc:relation ?person .
+                ?correspondent dc:relation ?person .
              }
-            """, initBindings={'label': correspondent})
-    for row in q:
-        g.add((s, dc.creator, URIRef(row[0])))
+            """, initBindings={'correspondent': snellman[correspondent]})
+    if len(list(q)) > 0:
+        for row in q:
+            g.add((s, dc.creator, URIRef(row[0])))
+    # Following adds creators for some letters in a risky way that may cause mistakes
+    else:
+        people = elem.find('field_henkilot')
+        if len(list(people)):
+            g.add((s, dc.creator, snellman[people[0][0][0].text]))
 
 def add_content(g, elem, s, g_content, id):
     content = elem.find('field_suomi')
