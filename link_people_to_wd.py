@@ -75,7 +75,7 @@ def link_people_wd_prefLabel(g):
         g.add((URIRef(row['henkilo']['value']), namespace.SKOS.exactMatch, URIRef(row['human']['value'])))
 
 g = Graph()
-g.parse('snellman.ttl', format='turtle')
+g.parse('turtle/snellman.ttl', format='turtle')
 link_people_wd(g)
 link_people_wd_prefLabel(g)
-g.serialize('snellman.ttl', format='turtle')
+g.serialize('turtle/snellman.ttl', format='turtle')

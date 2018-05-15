@@ -1,5 +1,6 @@
 from rdflib import Graph, Literal, namespace, Namespace, XSD, URIRef
 import requests
+import csv
 
 snellman = Namespace('http://ldf.fi/snellman/')
 
@@ -60,11 +61,36 @@ def link_places_to_wd(g):
     g.remove((snellman['13799'], namespace.SKOS.exactMatch, URIRef('http://www.wikidata.org/entity/Q145717')))
     g.remove((snellman['13729'], namespace.SKOS.exactMatch, URIRef('http://www.wikidata.org/entity/Q48370')))
 
+
+def link_to_yso(g, place_g, s, place, language):
+        location = Literal(place, lang=language)
+        q = place_g.query("""
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                SELECT ?s
+                WHERE { ?s skos:prefLabel ?label . }
+                """, initBindings={'label': location})
+        if len(list(q)) > 0:
+            for row in q:
+                g.add((s, namespace.SKOS.exactMatch, URIRef(row[0])))
+            return True
+        else:
+            return False
+
             
 g = Graph()
-g.parse('snellman.ttl', format='turtle')
-link_places_to_yso(g)
-link_places_to_wd(g)
+g.parse('turtle/snellman.ttl', format='turtle')
+#link_places_to_yso(g)
+#link_places_to_wd(g)
+
+csv_reader = csv.reader(open('taxonomy/taxocsv_4.csv', 'r'))
+yso_g = Graph()
+yso_g.parse('graphs/yso-paikat-skos.rdf')
+for row in csv_reader:
+    s = snellman[row[0]]
+    if link_to_yso(g, yso_g, s, row[1], 'fi'):
+        pass
+    else:
+        link_to_yso(g, yso_g, s, row[1], 'en')
 
 # Adding stuff by hand
 
@@ -75,4 +101,4 @@ g.add((snellman['13221'], namespace.SKOS.closeMatch, URIRef('https://finto.fi/ys
 g.add((snellman['13353'], namespace.SKOS.closeMatch, snellman['13221'])) # Alahärmä -> Palo
 g.add((snellman['13221'], namespace.SKOS.closeMatch, snellman['13353'])) # Palo -> Alahärmä
 
-g.serialize('snellman.ttl', format='turtle')
+g.serialize('turtle/snellman.ttl', format='turtle')
