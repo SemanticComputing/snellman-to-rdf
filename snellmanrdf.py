@@ -42,6 +42,8 @@ def add_basic_terms(g):
     g.add((snellman.letterSender, namespace.SKOS.prefLabel, Literal('Sender of the letter, kirjeen lahettaja')))
     g.add((snellman.dateComment, namespace.RDF.type, namespace.RDF.Property))
     g.add((snellman.dateComment, namespace.SKOS.prefLabel, Literal('Comment regarding the accuracy of the date')))
+    g.add((snellman.birthYear, namespace.RDF.type, namespace.RDF.Property))
+    g.add((snellman.deathYear, namespace.RDF.type, namespace.RDF.Property))
 
 
 add_basic_terms(graph)

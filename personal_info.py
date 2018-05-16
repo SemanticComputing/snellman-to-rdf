@@ -49,17 +49,28 @@ def add_bio(g, s, bio):
     bio = bio.replace("n. ", "")
     bio = bio.replace("synt. ", "")
     bio = bio.replace("synt.", "")
+    bio = bio.replace("Synt. ", "")
     bio = bio.replace("Synt.", "")
-    bio = bio.replace("Synt.", "")
+    bio = bio.replace("Syntynyt ", "")
     bio = bio.strip()
     #print(bio)
     if bio[0].isdigit():
         biosplit = bio.split('–')
         if len(list(biosplit)):
             if len(biosplit[0]) == 4:
-                g.add((s, dbo.birthYear, Literal(biosplit[0], datatype=XSD.gyear)))
+                g.add((s, snellman.birthYear, Literal(biosplit[0], datatype=XSD.integer)))
                 death = biosplit[1].split('.')[0].split(',')[0].split(' ')[0].split('/')[0].split('?')[0].split('e')[0]
                 if len(list(death)):
                     if len(death) == 4:
-                        g.add((s, dbo.deathYear, Literal(death, datatype=XSD.gyear)))
+                        g.add((s, snellman.deathYear, Literal(death, datatype=XSD.integer)))
+            elif len(biosplit[0]) == 3:
+                if 'eKr.' or 'e.Kr.' in biosplit:
+                    g.add((s, snellman.birthYear, Literal('-0' + biosplit[0], datatype=XSD.integer)))
+                else:
+                    g.add((s, snellman.birthYear, Literal('0' + biosplit[0], datatype=XSD.integer)))
+            else:
+                biosplit = bio.split('.')
+                if len(biosplit[0]) == 4:
+                    g.add((s, snellman.birthYear, Literal(biosplit[0], datatype=XSD.integer)))
     return g
+

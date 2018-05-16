@@ -63,8 +63,10 @@ def add_snellman(g):
     g.add((s, namespace.RDFS.comment, Literal('Poliitikko, kirjailija, sanomalehtimies, valtiomies ja Suomen kansallisfilosofi.', lang='fi')))
     g.add((s, namespace.FOAF.familyName, Literal('Snellman', lang='fi')))
     g.add((s, namespace.FOAF.givenName, Literal('Johan Vilhelm', lang='fi')))
-    g.add((s, dbo.birthYear, Literal('1806', datatype=XSD.gyear)))
-    g.add((s, dbo.deathYear, Literal('1881', datatype=XSD.gyear)))
+    #g.add((s, dbo.birthYear, '"1806"^^xsd:gYear'))
+    #g.add((s, dbo.deathYear, '"1881"^^xsd:gYear'))
+    g.add((s, snellman.birthYear, Literal('1806', datatype=XSD.integer)))
+    g.add((s, snellman.deathYear, Literal('1881', datatype=XSD.integer)))
     return g
 
 

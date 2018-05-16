@@ -15,12 +15,13 @@ def link_people_wd(g):
         PREFIX fo: <http://www.w3.org/1999/XSL/Format#>
         PREFIX wd: <http://www.wikidata.org/entity/>
         PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+        PREFIX snell: <http://ldf.fi/snellman/>
         
         SELECT DISTINCT ?henkilo ?human
         WHERE { 
             ?henkilo a foaf:Person .
             ?henkilo skos:altLabel ?nimi .
-            ?henkilo dbo:birthYear ?sbyear .
+            ?henkilo snell:birthYear ?sbyear .
             SERVICE <https://query.wikidata.org/sparql> {
                 ?human wdt:P31 wd:Q5 .
                 ?human rdfs:label ?nimi .
@@ -51,12 +52,13 @@ def link_people_wd_prefLabel(g):
         PREFIX fo: <http://www.w3.org/1999/XSL/Format#>
         PREFIX wd: <http://www.wikidata.org/entity/>
         PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+        PREFIX snell: <http://ldf.fi/snellman/>
         
         SELECT DISTINCT ?henkilo ?human
         WHERE { 
             ?henkilo a foaf:Person .
             ?henkilo skos:prefLabel ?nimi .
-            ?henkilo dbo:birthYear ?sbyear .
+            ?henkilo snell:birthYear ?sbyear .
             SERVICE <https://query.wikidata.org/sparql> {
                 ?human wdt:P31 wd:Q5 .
                 ?human rdfs:label ?nimi .
