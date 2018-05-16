@@ -3,8 +3,9 @@ import csv
 import re
 from rdflib import Graph, Literal, namespace, Namespace, XSD, URIRef
 from bs4 import BeautifulSoup
-import people_to_correspondence
+import people_to_correspondence_manually
 from string import digits
+import personal_info
 
 snellman = Namespace('http://ldf.fi/snellman/')
 dbo = Namespace('http://dbpedia.org/ontology/')
@@ -36,8 +37,8 @@ def add_kirjat_csv(g):
 
 
 def add_aiheet_csv(g):
-    g.add((snellman.Subject, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.Subject, namespace.SKOS.prefLabel, Literal('Aihe, Subject')))
+    g.add((snellman.subject, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.subject, namespace.SKOS.prefLabel, Literal('Aihe, Subject')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_5.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]
@@ -50,66 +51,7 @@ def add_henkilot_csv(g):
     add_snellman(g)
     csv_reader = csv.reader(open('taxonomy/taxocsv_10.csv', 'r'))
     for row in csv_reader:
-        add_personal_info(g, row)
-    return g
-
-
-def add_personal_info(g, row):
-    s = snellman[row[0]]
-    g.add((s, namespace.RDF.type, snellman.Actor))
-    g.add((s, namespace.RDF.type, namespace.FOAF.Person))
-    g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
-    name_split = row[1].split(',')
-    bracket_remover = re.compile('\(.*?\)')
-    if len(name_split) > 1:
-        family_name = re.sub(bracket_remover, '', name_split[0]).strip()
-        g.add((s, namespace.FOAF.familyName, Literal(family_name, lang='fi')))
-        first_name = re.sub(bracket_remover, '', name_split[1]).strip()
-        g.add((s, namespace.FOAF.givenName, Literal(first_name, lang='fi')))
-    if row[9]:
-        g.add((s, namespace.SKOS.altLabel, Literal(row[9], lang='fi')))
-    cleanr = re.compile('<.*?>')
-    bio = re.sub(cleanr, '', row[12])
-    if len(list(bio)):
-        add_bio(g, s, bio)
-    return g
-
-def first_name(name):
-    name_split = name.split(',')
-    bracket_remover = re.compile('\(.*?\)')
-    if len(name_split) > 1:
-        return re.sub(bracket_remover, '', name_split[1]).strip()
-    else:
-        return ''
-
-def family_name(name):
-    name_split = name.split(',')
-    bracket_remover = re.compile('\(.*?\)')
-    if len(name_split) > 1:
-        return re.sub(bracket_remover, '', name_split[0]).strip()
-    else:
-        return ''
-
-def add_bio(g, s, bio):
-    g.add((s, namespace.RDFS.comment, Literal(bio, lang='fi')))
-    # Adding birth and death years. Death years sometimes problematic...
-    bio = bio.replace("n.", "")
-    bio = bio.replace("n. ", "")
-    bio = bio.replace("synt. ", "")
-    bio = bio.replace("synt.", "")
-    bio = bio.replace("Synt.", "")
-    bio = bio.replace("Synt.", "")
-    bio = bio.strip()
-    #print(bio)
-    if bio[0].isdigit():
-        biosplit = bio.split('–')
-        if len(list(biosplit)):
-            if len(biosplit[0]) == 4:
-                g.add((s, dbo.birthYear, Literal(biosplit[0], datatype=XSD.gyear)))
-                death = biosplit[1].split('.')[0].split(',')[0].split(' ')[0].split('/')[0].split('?')[0].split('e')[0]
-                if len(list(death)):
-                    if len(death) == 4:
-                        g.add((s, dbo.deathYear, Literal(death, datatype=XSD.gyear)))
+        personal_info.add_personal_info(g, row)
     return g
 
 
@@ -121,8 +63,8 @@ def add_snellman(g):
     g.add((s, namespace.RDFS.comment, Literal('Poliitikko, kirjailija, sanomalehtimies, valtiomies ja Suomen kansallisfilosofi.', lang='fi')))
     g.add((s, namespace.FOAF.familyName, Literal('Snellman', lang='fi')))
     g.add((s, namespace.FOAF.givenName, Literal('Johan Vilhelm', lang='fi')))
-    g.add((s, dbo.birthyear, Literal('1806', datatype=XSD.gyear)))
-    g.add((s, dbo.deathyear, Literal('1881', datatype=XSD.gyear)))
+    g.add((s, dbo.birthYear, Literal('1806', datatype=XSD.gyear)))
+    g.add((s, dbo.deathYear, Literal('1881', datatype=XSD.gyear)))
     return g
 
 
@@ -138,23 +80,6 @@ def add_paikat_csv(g):
     return g
 
 
-#   add_links_to_paikka(s, row[1])
-
-def add_links_to_paikka(g, s, place):
-    yso_g = Graph()
-    yso_g.parse('graphs/yso-paikat-skos.rdf')
-    location = Literal(place, lang='fi')
-    q = yso_g.query("""
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            SELECT ?s
-            WHERE { ?s skos:prefLabel ?label . }
-            """, initBindings={'label': location})
-    for row in q:
-        g.add((s, namespace.SKOS.exactMatch, URIRef(row[0])))
-    return g
-    # some places need to be linked by hand...
-
-
 def add_kirjeenvaihto_csv(g):
     g.add((snellman.Correspondence, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.Correspondence, namespace.SKOS.prefLabel, Literal('Kirjeenvaihto, Correspondence')))
@@ -164,7 +89,7 @@ def add_kirjeenvaihto_csv(g):
         g.add((s, namespace.RDF.type, snellman.Correspondence))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
         link_correspondence_to_people(g, row, s)
-    people_to_correspondence.connect(g)
+    people_to_correspondence_manually.connect(g)
     return g
 
 
@@ -178,6 +103,9 @@ def add_tyypit_csv(g):
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
     return g
 
+
+
+# Linkkejä kirjeenvaihdon ja henkilöiden välille
 
 def link_correspondence_to_people(g, correspondent, letter_resource):
     #print(surname)
@@ -209,10 +137,10 @@ def link_by_name(g, correspondent, letter_resource):
         first_names = return_first_names_from_split(split_name)
         for row in csv_reader:
             person_resource = snellman[row[0]]
-            if (first_name(row[1]).split(' ')[0].strip() == first_names.strip()) and (family_name(row[1]) == surname):
+            if (personal_info.first_name(row[1]).split(' ')[0].strip() == first_names.strip()) and (personal_info.family_name(row[1]) == surname):
                 g.add((letter_resource, dc.relation, person_resource))
                 return True
-            if first_name(row[1]).strip() == first_names.strip() and family_name(row[1]) == surname:
+            if personal_info.first_name(row[1]).strip() == first_names.strip() and personal_info.family_name(row[1]) == surname:
                 g.add((letter_resource, dc.relation, person_resource))
                 return True
     return False

@@ -1,5 +1,4 @@
 from rdflib import Graph, Literal, namespace, Namespace, XSD, URIRef
-import people_to_correspondence
 import taxonomy
 import documents
 import corrections_to_places
