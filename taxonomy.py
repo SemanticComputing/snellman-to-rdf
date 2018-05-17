@@ -71,20 +71,21 @@ def add_snellman(g):
 
 
 def add_paikat_csv(g):
-    g.add((snellman.Place, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.Place, namespace.SKOS.prefLabel, Literal('Paikka, place')))
-    g.add((snellman.Place, namespace.SKOS.exactMatch, dbo.Place))
+    g.add((snellman.place, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.place, namespace.SKOS.prefLabel, Literal('Paikka, place')))
+    g.add((snellman.place, namespace.SKOS.exactMatch, dbo.Place))
     csv_reader = csv.reader(open('taxonomy/taxocsv_4.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]
         g.add((s, namespace.RDF.type, snellman.Place))
+        g.add((s, namespace.RDF.type, dbo.Place))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
     return g
 
 
 def add_kirjeenvaihto_csv(g):
-    g.add((snellman.Correspondence, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.Correspondence, namespace.SKOS.prefLabel, Literal('Kirjeenvaihto, Correspondence')))
+    g.add((snellman.correspondence, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.correspondence, namespace.SKOS.prefLabel, Literal('Kirjeenvaihto, Correspondence')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_8.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]
@@ -96,8 +97,8 @@ def add_kirjeenvaihto_csv(g):
 
 
 def add_tyypit_csv(g):
-    g.add((snellman.Doctype, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.Doctype, namespace.SKOS.prefLabel, Literal('Dokumentin tyyppi, document type')))
+    g.add((snellman.doctype, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.doctype, namespace.SKOS.prefLabel, Literal('Dokumentin tyyppi, document type')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_9.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]

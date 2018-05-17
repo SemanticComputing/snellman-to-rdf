@@ -36,7 +36,7 @@ def add_concepts(g, elem, s):
 def add_type(g, elem, s):
     doctype = elem.find('field_dokumentin_tyyppi')
     if len(list(doctype)):
-        g.add((s, namespace.RDF.type, snellman[doctype[0][0][0].text]))
+        g.add((s, dc.type, snellman[doctype[0][0][0].text]))
     return g
 
 
