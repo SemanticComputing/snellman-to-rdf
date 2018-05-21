@@ -62,13 +62,21 @@ def add_relations(g, elem, s, field):
 # Adding some extra properties to the letters. Unfinished...
 
 def add_creator(g, elem, s):
+    full_title = elem.find('title').text
+    title = full_title.split(",")[0]
+    remove_digits = str.maketrans('', '', digits)
+    no_dig_title = title.translate(remove_digits).strip()
     if len(list(elem.find('field_kirjeenvaihto'))):
         add_letter_sender(g, elem, s)
         places = elem.find('field_paikat')
         if len(list(places)):
             g.add((s, namespace.RDFS.seeAlso, snellman[places[0][0][0].text]))
-    else:
-        g.add((s, dc.creator, snellman['1']))
+        return g
+    elif get_type(g, s) == "Virkakirje" or "Yksityiskirje":
+            if (no_dig_title[len(no_dig_title) - 1] == 'a' or no_dig_title[len(no_dig_title) - 1] == 'ä') \
+                    and no_dig_title[len(no_dig_title) - 2] == 't':
+                return g
+    g.add((s, dc.creator, snellman['1']))
     return g
 
 
@@ -81,6 +89,23 @@ def add_letter_sender(g, elem, s):
         set_correspondent(g, elem, s)
     else:
         g.add((s, dc.creator, snellman['1']))
+
+# type needs to ne defined in graph...
+def get_type(g, s):
+    q = g.query("""
+            PREFIX snell: <http://ldf.fi/snellman/>
+            PREFIX dc: <http://purl.org/dc/elements/1.1/>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT ?stripped_label
+            WHERE {
+                ?s dc:type ?type .
+  	            ?type skos:prefLabel ?type_label .
+  	            BIND(STR(?type_label) As ?stripped_label) .
+             }
+            """, initBindings={'s': s})
+    for row in q:
+        return row[0]
+
 
 def set_correspondent(g, elem, s):
     correspondent = elem.find('field_kirjeenvaihto')[0][0][0].text

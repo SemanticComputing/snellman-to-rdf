@@ -5,24 +5,28 @@ import requests
 
 def link_nbf(g):
     q = '''
-    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>  
-    PREFIX snell: <hhtp://ldf.fi/snellman>
-    PREFIX fo: <http://www.w3.org/1999/XSL/Format#>
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
-    PREFIX gvp:	<http://vocab.getty.edu/ontology#>
-    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-    PREFIX dbo: <http://dbpedia.org/ontology/>
-    PREFIX nbf:	<http://ldf.fi/nbf/>
-    PREFIX skosxl: <http://www.w3.org/2008/05/skos-xl#>
-    PREFIX schema: <http://schema.org/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX snell: <http://ldf.fi/snellman/>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX place: <http://purl.org/ontology/places/>
+PREFIX fo: <http://www.w3.org/1999/XSL/Format#>
+PREFIX nbf:	<http://ldf.fi/nbf/>
+PREFIX skosxl: <http://www.w3.org/2008/05/skos-xl#>
+PREFIX schema: <http://schema.org/>
+PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+PREFIX gvp:	<http://vocab.getty.edu/ontology#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
     SELECT DISTINCT ?sperson ?nbfperson
     WHERE { 
         ?sperson a foaf:Person .
         ?sperson foaf:familyName ?familyName .
         ?sperson foaf:givenName ?firstName .
-        ?sperson dbo:birthYear ?sbirth .
+        ?sperson snell:birthYear ?sbirth .
         ?nbfperson a nbf:PersonConcept .
         ?nbfperson skosxl:prefLabel ?label .
         ?label schema:familyName ?familyName .
@@ -39,11 +43,11 @@ def link_nbf(g):
         
     response = requests.post('http://localhost:3030/ds/query',
                           data={'query': q})
-    
+
     for row in response.json()['results']['bindings']:
         g.add((URIRef(row['sperson']['value']), namespace.SKOS.exactMatch, URIRef(row['nbfperson']['value'])))
         
 g = Graph()
-g.parse('snellman.ttl', format='turtle')
+g.parse('turtle/snellman.ttl', format='turtle')
 link_nbf(g)
-g.serialize('snellman.ttl', format='turtle')
+g.serialize('turtle/snellman.ttl', format='turtle')
