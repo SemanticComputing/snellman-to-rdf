@@ -42,3 +42,6 @@ def connect(g):
 
     # Mathias Aleksander Castrén
     g.add((snellman['13413'], dc.relation, snellman['9617']))
+
+    # Carl Robert Ehrström
+    g.add((snellman['13268'], dc.relation, snellman['9934']))

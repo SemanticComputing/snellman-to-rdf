@@ -61,11 +61,15 @@ def add_relations(g, elem, s, field):
 
 # Adding some extra properties to the letters. Unfinished...
 
+def remove_extra(s):
+    answer = []
+    for char in s:
+        if (not char.isdigit()) and (char != '.'):
+            answer.append(char)
+    return ''.join(answer).replace('kesällä','').strip()
+
 def add_creator(g, elem, s):
-    full_title = elem.find('title').text
-    title = full_title.split(",")[0]
-    remove_digits = str.maketrans('', '', digits)
-    no_dig_title = title.translate(remove_digits).strip()
+    no_dig_title = remove_extra(elem.find('title').text.split(',')[0])
     if len(list(elem.find('field_kirjeenvaihto'))):
         add_letter_sender(g, elem, s)
         places = elem.find('field_paikat')
@@ -81,16 +85,13 @@ def add_creator(g, elem, s):
 
 
 def add_letter_sender(g, elem, s):
-    full_title = elem.find('title').text
-    title = full_title.split(",")[0]
-    remove_digits = str.maketrans('', '', digits)
-    no_dig_title = title.translate(remove_digits).strip()
-    if (no_dig_title[len(no_dig_title) - 1] == 'a' or no_dig_title[len(no_dig_title) - 1] == 'ä') and no_dig_title[len(no_dig_title) - 2] == 't':
+    no_dig_title = remove_extra(elem.find('title').text.split(',')[0])
+    if (no_dig_title[len(no_dig_title) - 1] == 'a' or no_dig_title[len(no_dig_title) - 1] == 'ä') and (no_dig_title[len(no_dig_title) - 2] == 't'):
         set_correspondent(g, elem, s)
     else:
         g.add((s, dc.creator, snellman['1']))
 
-# type needs to ne defined in graph...
+# type needs to be defined in graph before this is called...
 def get_type(g, s):
     q = g.query("""
             PREFIX snell: <http://ldf.fi/snellman/>
@@ -122,6 +123,7 @@ def set_correspondent(g, elem, s):
         for row in q:
             g.add((s, dc.creator, URIRef(row[0])))
     # Following adds creators for some letters in a risky way that may cause mistakes
+    # The first person in field_henkilöt is a likely creator of the letter, but this could be done better
     else:
         people = elem.find('field_henkilot')
         if len(list(people)):
@@ -238,7 +240,6 @@ def add_secondary_info(g_content, elem):
     except:
         pass
 
-
 def add_export(g, g_content):
     for event, elem in ET.iterparse('export.xml', events=("start", "end")):
         if event == 'end':
@@ -258,6 +259,5 @@ def add_export(g, g_content):
                     #print(ET.tostring(elem, encoding='utf8', method='xml'))
                 #else:
                 #    print(elem.find('type').text)
-
     return g
 
