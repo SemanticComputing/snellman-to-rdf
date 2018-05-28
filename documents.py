@@ -116,7 +116,7 @@ def set_correspondent(g, elem, s):
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
             SELECT ?person
             WHERE {
-                ?correspondent dc:relation ?person .
+                ?correspondent snell:correspondent ?person .
              }
             """, initBindings={'correspondent': snellman[correspondent]})
     if len(list(q)) > 0:
@@ -147,7 +147,10 @@ def add_date_comment(g, elem, s):
 
 def add_document_to_graph(g, elem, g_content):
     document_id = elem.find('nid').text
-    s = snellman[document_id]
+
+    s = snellman[document_id]   # Bad naming, this is used a lot as subject in rdf, but it could be named better
+
+    g.add((s, snellman.materialType, Literal('tekstilahde')))
     g.add((s, namespace.RDF.type, snellman.Document))
     g.add((s, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
     path = elem.find('path')
@@ -172,7 +175,7 @@ def add_matrikkeli(g_content, elem):
     content = elem.find('body')[0][0][0]
     g_content.add((resource, snellman.hasText, Literal(BeautifulSoup(content.text, 'lxml').text)))
     g_content.add((resource, snellman.hasHTML, Literal(content.text)))
-    g_content.add((resource, dc.type, Literal('matrikkeli')))
+    g_content.add((resource, snellman.materialType, Literal('matrikkeli')))
     path = elem.find('path')
     g_content.add((resource, dc.source, URIRef('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
     time = elem.find('field_pvm_alkean')
@@ -184,7 +187,7 @@ def add_picture(g_content, elem):
     resource = snellman['content/pic' + elem.find('nid').text]
     g_content.add((resource, namespace.RDF.type, snellman.Material))
     g_content.add((resource, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
-    g_content.add((resource, dc.type, Literal('kuvalahde')))
+    g_content.add((resource, snellman.materialType, Literal('kuvalahde')))
     path = elem.find('path')
     g_content.add((resource, dc.source, URIRef('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
     add_time(g_content, elem, resource)
@@ -194,7 +197,7 @@ def add_kirjallisuutta(g_content, elem):
     resource = snellman['content/m' + elem.find('nid').text]
     g_content.add((resource, namespace.RDF.type, snellman.Material))
     g_content.add((resource, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
-    g_content.add((resource, dc.type, Literal('kirjallisuutta')))
+    g_content.add((resource, snellman.materialType, Literal('kirjallisuutta')))
     try:
         content = elem.find('body')[0][0][0]
         g_content.add((resource, snellman.hasText, Literal(BeautifulSoup(content.text, 'lxml').text)))

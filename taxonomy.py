@@ -125,10 +125,10 @@ def link_by_label(g, correspondent, letter_resource):
     for row in csv_reader:
         person_resource = snellman[row[0]]
         if row[9] == correspondent:
-            g.add((letter_resource, dc.relation, person_resource))
+            g.add((letter_resource, snellman.correspondent, person_resource))
             return True
         elif row[1] == correspondent:
-            g.add((letter_resource, dc.relation, person_resource))
+            g.add((letter_resource, snellman.correspondent, person_resource))
             return True
 
 
@@ -141,10 +141,10 @@ def link_by_name(g, correspondent, letter_resource):
         for row in csv_reader:
             person_resource = snellman[row[0]]
             if (personal_info.first_name(row[1]).split(' ')[0].strip() == first_names.strip()) and (personal_info.family_name(row[1]) == surname):
-                g.add((letter_resource, dc.relation, person_resource))
+                g.add((letter_resource, snellman.correspondent, person_resource))
                 return True
             if personal_info.first_name(row[1]).strip() == first_names.strip() and personal_info.family_name(row[1]) == surname:
-                g.add((letter_resource, dc.relation, person_resource))
+                g.add((letter_resource, snellman.correspondent, person_resource))
                 return True
     return False
 
