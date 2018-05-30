@@ -66,7 +66,7 @@ def add_basic_schema(g):
     g.add((snellman.relation, namespace.SKOS.prefLabel, Literal('A resource related to the text')))
 
     g.add((snellman.nbf, namespace.RDF.type, namespace.RDF.Property))
-    g.add(())
+    g.add((snellman.nbf, namespace.SKOS.prefLabel, Literal('Link to nbf resource')))
 
 
 add_basic_schema(graph)

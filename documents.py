@@ -74,7 +74,7 @@ def add_creator(g, elem, s):
         add_letter_sender(g, elem, s)
         places = elem.find('field_paikat')
         if len(list(places)):
-            g.add((s, namespace.RDFS.seeAlso, snellman[places[0][0][0].text]))
+            g.add((s, snellman.writtenIn, snellman[places[0][0][0].text]))
         return g
     elif get_type(g, s) == "Virkakirje" or "Yksityiskirje":
             if (no_dig_title[len(no_dig_title) - 1] == 'a' or no_dig_title[len(no_dig_title) - 1] == 'ä') \
