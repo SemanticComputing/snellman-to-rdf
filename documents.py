@@ -134,6 +134,7 @@ def add_content(g, elem, s, g_content, id):
     c_resource = snellman['content/c' + id]
     if len(list(content)):
         g.add((s, snellman.hasContent, c_resource))
+        g_content.add((c_resource, namespace.RDF.type, snellman.Content))
         g_content.add((c_resource, snellman.hasText, Literal(BeautifulSoup(content[0][0][3].text, 'lxml').text)))
         g_content.add((c_resource, snellman.hasHTML, Literal(content[0][0][3].text)))
     return g
@@ -150,9 +151,12 @@ def add_document_to_graph(g, elem, g_content):
 
     s = snellman[document_id]   # Bad naming, this is used a lot as subject in rdf, but it could be named better
 
+    g.add((s, namespace.RDF.type, snellman.Material))
     g.add((s, snellman.materialType, Literal('tekstilahde')))
+
     g.add((s, namespace.RDF.type, snellman.Document))
     g.add((s, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
+
     path = elem.find('path')
     g.add((s, dc.source, URIRef('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
     g = add_people(g, elem, s)

@@ -22,7 +22,7 @@ content_graph.bind('foaf', namespace.FOAF)
 content_graph.bind('dbo', dbo)
 
 
-def add_basic_terms(g):
+def add_basic_schema(g):
     g.add((snellman.document, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.document, namespace.SKOS.prefLabel, Literal('Document')))
 
@@ -65,8 +65,11 @@ def add_basic_terms(g):
     g.add((snellman.relation, namespace.RDF.type, namespace.RDF.Property))
     g.add((snellman.relation, namespace.SKOS.prefLabel, Literal('A resource related to the text')))
 
+    g.add((snellman.nbf, namespace.RDF.type, namespace.RDF.Property))
+    g.add(())
 
-add_basic_terms(graph)
+
+add_basic_schema(graph)
 taxonomy.add_aiheet_csv(graph)
 taxonomy.add_henkilot_csv(graph)
 taxonomy.add_paikat_csv(graph)
