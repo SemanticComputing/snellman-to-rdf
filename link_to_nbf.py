@@ -1,8 +1,9 @@
-from rdflib import Graph,namespace, URIRef
+from rdflib import Graph,namespace, Namespace, URIRef
 import requests
 import json
 import csv
 
+snellman = Namespace('http://ldf.fi/snellman/')
 
 def link_nbf(g):
     q = '''
@@ -81,7 +82,7 @@ def find_nbf_people():
         BIND(year(xsd:date(?birthtime)) as ?birthyear) .
         FILTER(?birthyear < 1882)
     }
-    ORDER BY DESC(?birthyear)
+    ORDER BY ASC(?birthyear)
     '''
     response = requests.post('http://localhost:3030/ds/query',
                              data={'query': q})
@@ -113,7 +114,7 @@ def find_snellman_people():
             ?person foaf:givenName ?firstName .
             ?person snell:birthYear ?birthYear .
         }
-        ORDER BY DESC(?birthYear)
+        ORDER BY ASC(?birthYear)
         '''
 
     response = requests.post('http://localhost:3030/ds/query',
@@ -124,40 +125,115 @@ def find_snellman_people():
             csvfile.write(row['person']['value'] + ',' + row['birthYear']['value'] + ',' \
                           + row['familyName']['value'] + ',' + row['firstName']['value'] + '\n')
 
-#g = Graph()
-#g.parse('turtle/snellman.ttl', format='turtle')
+
+def binary_search(values, target):
+    low = 0
+    high = len(values) - 1
+    while low <= high:
+        mid = (high + low) // 2
+        if values[mid] == target:
+            return mid
+        elif target < values[mid]:
+            high = mid - 1
+        else:
+            low = mid + 1
+    return -1
+
+def make_birth_list(csv):
+    birth_list = []
+    x=0
+    for row in csv:
+        birth_list.append(int(row[1]))
+        x = x+1
+    return birth_list
+
+#previous index actually :)
+def find_index_of_year(year, list):
+    index = binary_search(list, year)
+    if index < 0:
+        return index
+    else:
+        while list[index] >= year:
+            index = index - 1
+    return index
+
+def make_list(csv, index):
+    list = []
+    x=0
+    for row in csv:
+        list.append(row[index])
+        x = x+1
+    return list
+
+
+def nbf_from_csv(g):
+
+    csv_snell = csv.reader(open('graphs/people.csv', 'r'))
+
+    csv_nbf = csv.reader(open('graphs/nbf.csv', 'r'))
+    nbf_birth_list = make_birth_list(csv_nbf)
+
+    csv_nbf = csv.reader(open('graphs/nbf.csv', 'r'))
+    nbf_first_name_list = make_list(csv_nbf, 3)
+
+    csv_nbf = csv.reader(open('graphs/nbf.csv', 'r'))
+    nbf_family_name_list = make_list(csv_nbf, 2)
+
+    csv_nbf = csv.reader(open('graphs/nbf.csv', 'r'))
+    nbf_uri_list = make_list(csv_nbf, 0)
+
+    for row in csv_snell:
+        index = find_index_of_year(int(row[1]), nbf_birth_list)
+        #print(nbindex)
+        if index >= 0:
+            x=0
+            while nbf_birth_list[index] <= int(row[1]):
+                #print(index)
+                #print(nbf_first_name_list[index])
+                if row[2] == nbf_family_name_list[index] and row[3] == nbf_first_name_list[index]:
+                    g.add((URIRef(row[0]), snellman.nbf, URIRef(nbf_uri_list[index])))
+                index = index + 1
+
+def link_places(g):
+    q = '''
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        PREFIX dbo: <http://dbpedia.org/ontology/>
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        PREFIX snell: <http://ldf.fi/snellman/>
+        PREFIX dc: <http://purl.org/dc/elements/1.1/>
+        PREFIX place: <http://purl.org/ontology/places/>
+        PREFIX fo: <http://www.w3.org/1999/XSL/Format#>
+        PREFIX nbf:	<http://ldf.fi/nbf/>
+        PREFIX skosxl: <http://www.w3.org/2008/05/skos-xl#>
+        PREFIX schema: <http://schema.org/>
+        PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/>
+        PREFIX gvp:	<http://vocab.getty.edu/ontology#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+        SELECT DISTINCT ?place ?nbfPlace
+        WHERE {
+            ?place a snell:Place .
+            ?place skos:prefLabel ?placeLabel .
+            ?nbfPlace a nbf:Place .
+            ?nbfPlace skos:prefLabel ?placeLabel .
+        }
+        '''
+
+    response = requests.post('http://localhost:3030/ds/query',
+                                     data={'query': q})
+
+    for row in response.json()['results']['bindings']:
+        g.add((URIRef(row['place']['value']), snellman.nbf, URIRef(row['nbfPlace']['value'])))
+
+g = Graph()
+g.parse('turtle/snellman.ttl', format='turtle')
 #link_nbf(g)
-#g.serialize('turtle/snellman.ttl', format='turtle')
 #find_nbf_people()
 #find_snellman_people()
 
-def previous_year(listcsv, x):
-    idx0 = 0
-    idxn = (len(listcsv) - 1)
-    print(listcsv[idx0][1])
-    print(listcsv[idxn][1])
+nbf_from_csv(g)
+link_places(g)
 
-    while idx0 <= idxn and x <= int(listcsv[idx0][1]) and x >= int(listcsv[idxn][1]):
-        mid = idx0 + \
-              int(((float(idxn - idx0) / 2)))
-        print(mid)
-        print(int(listcsv[mid][1]))
-    # Compare the value at mid point with search value
-        if int(listcsv[mid][1]) == x:
-            while not x > int(listcsv[mid][1]):
-                mid = mid - 1
-            return mid
-
-        if int(listcsv[mid][1]) > x:
-            idxn = mid - 1
-
-        if int(listcsv[mid][1]) < x:
-            idx0 = mid + 1
-
-    return -1
-
-csv_reader = csv.reader(open('graphs/people.csv', 'r'))
-#csv_reader = csv.reader(open('graphs/nbf.csv', 'r'))
-
-
-print(previous_year(list(csv_reader), 1830))
+g.serialize('turtle/snellman.ttl', format='turtle')
