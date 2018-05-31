@@ -8,7 +8,6 @@ dc = Namespace('http://purl.org/dc/elements/1.1/')
 
 def add_personal_info(g, person):
     s = snellman[person[0]]
-    g.add((s, namespace.RDF.type, snellman.Actor))
     g.add((s, namespace.RDF.type, namespace.FOAF.Person))
     g.add((s, namespace.SKOS.prefLabel, Literal(person[1], lang='fi')))
     name_split = person[1].split(',')

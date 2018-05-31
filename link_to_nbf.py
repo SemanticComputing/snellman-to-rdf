@@ -153,7 +153,7 @@ def find_index_of_year(year, list):
     if index < 0:
         return index
     else:
-        while list[index] >= year:
+        while list[index] >= year and index > 0:
             index = index - 1
     return index
 
