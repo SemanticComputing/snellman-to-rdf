@@ -3,6 +3,7 @@ import requests
 import csv
 
 snellman = Namespace('http://ldf.fi/snellman/')
+owl = Namespace('http://www.w3.org/2002/07/owl#')
 
 # Links to both yso and ysa, not used currently
 
@@ -66,8 +67,8 @@ def link_to_yso(g, place_g, s, place, language):
         location = Literal(place, lang=language)
         q = place_g.query("""
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                SELECT ?s
-                WHERE { ?s skos:prefLabel ?label . }
+                SELECT ?place
+                WHERE { ?place skos:prefLabel ?label . }
                 """, initBindings={'label': location})
         if len(list(q)) > 0:
             for row in q:
@@ -80,8 +81,8 @@ def link_by_altLabel(g, place_g, s, place, language):
     location = Literal(place, lang=language)
     q = place_g.query("""
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            SELECT ?s
-            WHERE { ?s skos:altLabel ?label . }
+            SELECT ?place
+            WHERE { ?place skos:altLabel ?label . }
             """, initBindings={'label': location})
     if len(list(q)) > 0:
         for row in q:

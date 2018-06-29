@@ -46,8 +46,8 @@ def add_basic_schema(g):
     g.add((snellman.actor, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.actor, namespace.SKOS.prefLabel, Literal('Actor, toimija')))
 
-    g.add((snellman.letterSender, namespace.RDF.type, namespace.RDF.Property))
-    g.add((snellman.letterSender, namespace.SKOS.prefLabel, Literal('Sender of the letter, kirjeen lahettaja')))
+    #g.add((snellman.letterSender, namespace.RDF.type, namespace.RDF.Property))
+    #g.add((snellman.letterSender, namespace.SKOS.prefLabel, Literal('Sender of the letter, kirjeen lahettaja')))
 
     g.add((snellman.dateComment, namespace.RDF.type, namespace.RDF.Property))
     g.add((snellman.dateComment, namespace.SKOS.prefLabel, Literal('Comment regarding the accuracy of the date')))
@@ -57,13 +57,13 @@ def add_basic_schema(g):
     g.add((snellman.deathYear, namespace.RDF.type, namespace.RDF.Property))
 
     g.add((snellman.correspondent, namespace.RDF.type, namespace.RDF.Property))
-    g.add((snellman.letterSender, namespace.SKOS.prefLabel, Literal('Person or organisation related to the correspondence resource')))
+    g.add((snellman.correspondent, namespace.SKOS.prefLabel, Literal('Person or organisation related to the correspondence resource')))
 
     g.add((snellman.writtenIn, namespace.RDF.type, namespace.RDF.Property))
     g.add((snellman.writtenIn, namespace.SKOS.prefLabel, Literal('Place where the text was propably written')))
 
-    g.add((snellman.relation, namespace.RDF.type, namespace.RDF.Property))
-    g.add((snellman.relation, namespace.SKOS.prefLabel, Literal('A resource related to the text')))
+    #g.add((snellman.relation, namespace.RDF.type, namespace.RDF.Property))
+    #g.add((snellman.relation, namespace.SKOS.prefLabel, Literal('A resource related to the text')))
 
     g.add((snellman.nbf, namespace.RDF.type, namespace.RDF.Property))
     g.add((snellman.nbf, namespace.SKOS.prefLabel, Literal('Link to nbf resource')))
@@ -77,6 +77,7 @@ taxonomy.add_kirjeenvaihto_csv(graph)
 taxonomy.add_tyypit_csv(graph)
 taxonomy.add_kirjat_csv(graph)
 taxonomy.add_luvut_csv(graph)
+taxonomy.add_termit_csv(graph)
 documents.add_export(graph, content_graph)
 corrections_to_places.correct_places_on_letters(graph)
 

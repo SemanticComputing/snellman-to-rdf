@@ -14,9 +14,19 @@ dc = Namespace('http://purl.org/dc/elements/1.1/')
 
 # Methods for the csv-files
 
+def add_termit_csv(g):
+    g.add((snellman.subjectTerm, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.subjectTerm, namespace.SKOS.prefLabel, Literal('Termi', lang='fi')))
+    csv_reader = csv.reader(open('taxonomy/taxocsv_11.csv', 'r'))
+    for row in csv_reader:
+        resource = snellman[row[0]]
+        g.add((resource, namespace.RDF.type, snellman.SubjectTerm))
+        g.add((resource, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
+    return g
+
 def add_luvut_csv(g):
     g.add((snellman.chapter, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.chapter, namespace.SKOS.prefLabel, Literal('Chapter, kirjan luku')))
+    g.add((snellman.chapter, namespace.SKOS.prefLabel, Literal('Chapter', lang='fi')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_13.csv', 'r'))
     for row in csv_reader:
         resource = snellman[row[0]]
@@ -27,7 +37,7 @@ def add_luvut_csv(g):
 
 def add_kirjat_csv(g):
     g.add((snellman.bioBook, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.bioBook, namespace.SKOS.prefLabel, Literal('Biograhical book, elamankerrallinen kirja')))
+    g.add((snellman.bioBook, namespace.SKOS.prefLabel, Literal('Elamankerrallinen kirja', lang='fi')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_12.csv', 'r'))
     for row in csv_reader:
         resource = snellman[row[0]]
@@ -38,7 +48,7 @@ def add_kirjat_csv(g):
 
 def add_aiheet_csv(g):
     g.add((snellman.subject, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.subject, namespace.SKOS.prefLabel, Literal('Aihe, Subject')))
+    g.add((snellman.subject, namespace.SKOS.prefLabel, Literal('Aihe', lang='fi')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_5.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]
@@ -73,7 +83,7 @@ def add_snellman(g):
 
 def add_paikat_csv(g):
     g.add((snellman.place, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.place, namespace.SKOS.prefLabel, Literal('Paikka, place')))
+    g.add((snellman.place, namespace.SKOS.prefLabel, Literal('Paikka', lang='fi')))
     g.add((snellman.place, namespace.SKOS.exactMatch, dbo.Place))
     csv_reader = csv.reader(open('taxonomy/taxocsv_4.csv', 'r'))
     for row in csv_reader:
@@ -86,7 +96,7 @@ def add_paikat_csv(g):
 
 def add_kirjeenvaihto_csv(g):
     g.add((snellman.correspondence, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.correspondence, namespace.SKOS.prefLabel, Literal('Kirjeenvaihto, Correspondence')))
+    g.add((snellman.correspondence, namespace.SKOS.prefLabel, Literal('Kirjeenvaihto', lang='fi')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_8.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]
@@ -99,7 +109,7 @@ def add_kirjeenvaihto_csv(g):
 
 def add_tyypit_csv(g):
     g.add((snellman.doctype, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.doctype, namespace.SKOS.prefLabel, Literal('Dokumentin tyyppi, document type')))
+    g.add((snellman.doctype, namespace.SKOS.prefLabel, Literal('Dokumentin tyyppi', lang='fi')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_9.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]

@@ -15,21 +15,29 @@ dc = Namespace('http://purl.org/dc/elements/1.1/')
 def add_people(g, elem, s):
     people = elem.find('field_henkilot')
     if len(list(people)):
-        add_relations(g, elem, s, people[0])
+        add_relations(g, s, people[0])
     return g
 
 
 def add_places(g, elem, s):
     places = elem.find('field_paikat')
     if len(list(places)):
-        add_relations(g, elem, s, places[0])
+        add_relations(g, s, places[0])
     return g
 
 
 def add_concepts(g, elem, s):
     concepts = elem.find('field_asiat')
     if len(list(concepts)):
-        add_relations(g, elem, s, concepts[0])
+        for subject in concepts[0]:
+            g.add((s, dc.subject, snellman[subject[0].text]))
+    return g
+
+def add_terms(g, elem, s):
+    terms = elem.find('field_termit')
+    if len(list(terms)):
+        for term in terms[0]:
+            g.add((s, dc.subject, snellman[term[0].text]))
     return g
 
 
@@ -53,7 +61,7 @@ def add_correspondence(g, elem, s):
     return g
 
 
-def add_relations(g, elem, s, field):
+def add_relations(g, s, field):
     for resource in field:
         g.add((s, dc.relation, snellman[resource[0].text]))
     return g
@@ -162,6 +170,7 @@ def add_document_to_graph(g, elem, g_content):
     g = add_people(g, elem, s)
     g = add_places(g, elem, s)
     g = add_concepts(g, elem, s)
+    g = add_terms(g, elem, s)
     g = add_type(g, elem, s)
     g = add_time(g, elem, s)
     g = add_date_comment(g, elem, s)
