@@ -23,13 +23,16 @@ def link_people_wd(g):
             ?henkilo skos:altLabel ?nimi .
             ?henkilo snell:birthYear ?sbyear .
             SERVICE <https://query.wikidata.org/sparql> {
-                ?human wdt:P17 wd:Q5 .
+                ?human wdt:P31 wd:Q5 .
+                ?human rdfs:label ?nimi .
+                ?human wdt:P569 ?wdbdate .
                 }
         BIND(xsd:integer(?sbyear) as ?s_birth_year) .
         BIND(year(xsd:date(?wdbdate)) as ?wd_birth_year) .
         FILTER(?s_birth_year = ?wd_birth_year) .
         }
         '''
+    # ?human wdt:P17 wd:Q5 .
 
     response = requests.post('http://localhost:3030/ds/query',
                           data={'query': q})
