@@ -15,14 +15,16 @@ dc = Namespace('http://purl.org/dc/elements/1.1/')
 def add_people(g, elem, s):
     people = elem.find('field_henkilot')
     if len(list(people)):
-        add_relations(g, s, people[0])
+        for resource in people[0]:
+            g.add((s, snellman.relatedPerson, snellman[resource[0].text]))
     return g
 
 
 def add_places(g, elem, s):
     places = elem.find('field_paikat')
     if len(list(places)):
-        add_relations(g, s, places[0])
+        for resource in places[0]:
+            g.add((s, snellman.relatedPlace, snellman[resource[0].text]))
     return g
 
 
@@ -57,13 +59,7 @@ def add_time(g, elem, s):
 def add_correspondence(g, elem, s):
     correspondent = elem.find('field_kirjeenvaihto')
     if len(list(correspondent)):
-        g.add((s, dc.relation, snellman[correspondent[0][0][0].text]))
-    return g
-
-
-def add_relations(g, s, field):
-    for resource in field:
-        g.add((s, dc.relation, snellman[resource[0].text]))
+        g.add((s, snellman.relatedCorrespondence, snellman[correspondent[0][0][0].text]))
     return g
 
 

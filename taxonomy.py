@@ -26,7 +26,7 @@ def add_termit_csv(g):
 
 def add_luvut_csv(g):
     g.add((snellman.chapter, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.chapter, namespace.SKOS.prefLabel, Literal('Chapter', lang='fi')))
+    g.add((snellman.chapter, namespace.SKOS.prefLabel, Literal('Luku', lang='fi')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_13.csv', 'r'))
     for row in csv_reader:
         resource = snellman[row[0]]
@@ -37,11 +37,11 @@ def add_luvut_csv(g):
 
 def add_kirjat_csv(g):
     g.add((snellman.bioBook, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.bioBook, namespace.SKOS.prefLabel, Literal('Elamankerrallinen kirja', lang='fi')))
+    g.add((snellman.bioBook, namespace.SKOS.prefLabel, Literal('Elamänkerrallinen kirja', lang='fi')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_12.csv', 'r'))
     for row in csv_reader:
         resource = snellman[row[0]]
-        g.add((resource, namespace.RDF.type, snellman.bioBook))
+        g.add((resource, namespace.RDF.type, snellman.BioBook))
         g.add((resource, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
     return g
 
@@ -70,7 +70,7 @@ def add_snellman(g):
     g.add((s, namespace.RDF.type, namespace.FOAF.Person))
     g.add((s, namespace.SKOS.prefLabel, Literal('Snellman, Johan Vilhelm', lang='fi')))
     g.add((s, namespace.SKOS.altLabel, Literal('J. V. Snellman', lang='fi')))
-    g.add((s, namespace.RDFS.comment, Literal('Poliitikko, kirjailija, sanomalehtimies, valtiomies ja Suomen kansallisfilosofi.', lang='fi')))
+    g.add((s, namespace.RDFS.comment, Literal('1806-1881 Poliitikko, kirjailija, sanomalehtimies, valtiomies ja Suomen kansallisfilosofi.', lang='fi')))
     g.add((s, namespace.FOAF.familyName, Literal('Snellman', lang='fi')))
     g.add((s, namespace.FOAF.givenName, Literal('Johan Vilhelm', lang='fi')))
     g.add((s, snellman.nbf, URIRef('http://ldf.fi/nbf/p996')))
@@ -89,11 +89,10 @@ def add_paikat_csv(g):
     for row in csv_reader:
         s = snellman[row[0]]
         g.add((s, namespace.RDF.type, snellman.Place))
-        g.add((s, namespace.RDF.type, dbo.Place))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
     return g
 
-
+'''
 def add_kirjeenvaihto_csv(g):
     g.add((snellman.correspondence, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.correspondence, namespace.SKOS.prefLabel, Literal('Kirjeenvaihto', lang='fi')))
@@ -105,7 +104,7 @@ def add_kirjeenvaihto_csv(g):
         link_correspondence_to_people(g, row, s)
     people_to_correspondence_manually.connect(g)
     return g
-
+'''
 
 def add_tyypit_csv(g):
     g.add((snellman.doctype, namespace.RDF.type, namespace.RDFS.Class))
@@ -117,7 +116,7 @@ def add_tyypit_csv(g):
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
     return g
 
-
+'''
 
 # Linkkejä kirjeenvaihdon ja henkilöiden välille
 
@@ -167,3 +166,4 @@ def return_first_names_from_split(name):
         first_names = first_names + ' ' + name[x]
         x = x+1
     return first_names
+    '''

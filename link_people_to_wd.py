@@ -77,6 +77,7 @@ def link_people_wd_prefLabel(g):
     for row in response.json()['results']['bindings']:
         g.add((URIRef(row['henkilo']['value']), namespace.SKOS.exactMatch, URIRef(row['human']['value'])))
 
+
 g = Graph()
 g.parse('turtle/snellman.ttl', format='turtle')
 link_people_wd(g)

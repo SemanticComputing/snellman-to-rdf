@@ -45,3 +45,15 @@ def connect(g):
 
     # Carl Robert Ehrström
     g.add((snellman['13268'], snellman.correspondent, snellman['9934']))
+
+    # af bruner
+    g.add((snellman['13691'], snellman.correspondent, snellman['9469']))
+
+    # ilmon -> ilmoni
+    g.add((snellman['13774'], snellman.correspondent, snellman['10750']))
+
+    # misspelled Nervander
+    g.add((snellman['13822'], snellman.correspondent, snellman['11622']))
+
+    # von Rothschild
+    g.add((snellman['13757'], snellman.correspondent, snellman['12119']))
