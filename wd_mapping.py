@@ -10,7 +10,7 @@ def get_wikidata_csv():
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
         SELECT DISTINCT ?human ?nimiFI ?nimiSV (year(?wdbdate) as ?birthYear)
-        WHERE { 
+        WHERE {
             ?human wdt:P31 wd:Q5 .
             ?human rdfs:label ?nimiFI .
             ?human rdfs:label ?nimiSV .

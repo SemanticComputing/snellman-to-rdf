@@ -26,18 +26,23 @@ content_graph.bind('dbo', dbo)
 def add_basic_schema(g):
     g.add((snellman.document, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.document, namespace.SKOS.prefLabel, Literal('Document', lang='en')))
+    g.add((snellman.document, namespace.SKOS.prefLabel, Literal('Dokumentti, tekstilähde', lang='fi')))
 
     g.add((snellman.content, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.content, namespace.SKOS.prefLabel, Literal('Resource for document content', lang='en')))
+    g.add((snellman.content, namespace.SKOS.prefLabel, Literal('Sisällön resurssi', lang='fi')))
 
     g.add((snellman.hasContent, namespace.RDF.type, namespace.RDF.Property))
     g.add((snellman.hasContent, namespace.SKOS.prefLabel, Literal('Link to content resource', lang='en')))
+    g.add((snellman.hasContent, namespace.SKOS.prefLabel, Literal('Dokumenttiin liittyvä sisältö', lang='fi')))
 
     g.add((snellman.hasText, namespace.RDF.type, namespace.RDF.Property))
     g.add((snellman.hasText, namespace.SKOS.prefLabel, Literal('Content as text', lang='en')))
+    g.add((snellman.hasText, namespace.SKOS.prefLabel, Literal('Sisältö muotoilemattomana tekstinä', lang='fi')))
 
     g.add((snellman.hasHTML, namespace.RDF.type, namespace.RDF.Property))
     g.add((snellman.hasHTML, namespace.SKOS.prefLabel, Literal('Content in HTML-format', lang='en')))
+    g.add((snellman.hasHTML, namespace.SKOS.prefLabel, Literal('Sisältö HTML-muodossa', lang='fi')))
 
     g.add((snellman.material, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.material, namespace.SKOS.prefLabel, Literal('Biographic material', lang='en')))
@@ -64,6 +69,7 @@ def add_basic_schema(g):
 
     g.add((snellman.writtenIn, namespace.RDF.type, namespace.RDF.Property))
     g.add((snellman.writtenIn, namespace.SKOS.prefLabel, Literal('Place where the text was propably written', lang='en')))
+    g.add((snellman.writtenIn, namespace.RDFS.subPropertyOf, snellman.relatedPlace))
 
     #g.add((snellman.relation, namespace.RDF.type, namespace.RDF.Property))
     #g.add((snellman.relation, namespace.SKOS.prefLabel, Literal('A resource related to the text')))
@@ -110,3 +116,8 @@ corrections_to_places.correct_places_on_letters(graph)
 
 graph.serialize('turtle/snellman.ttl', format='turtle')
 content_graph.serialize('turtle/snellman_content.ttl', format='turtle')
+
+#full_graph = Graph()
+#full_graph.parse('turtle/snellman.ttl', format='turtle')
+#full_graph.parse('turtle/snellman_content.ttl', format='turtle')
+#full_graph.serialize('turtle/snellman_works_full.ttl', format='turtle')

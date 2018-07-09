@@ -76,9 +76,13 @@ def add_creator(g, elem, s):
     no_dig_title = remove_extra(elem.find('title').text.split(',')[0])
     if len(list(elem.find('field_kirjeenvaihto'))):
         add_letter_sender(g, elem, s)
+
+        # Place where the letter is written is added if, and only if, there is only one place listed
+
         places = elem.find('field_paikat')
         if len(list(places)):
-            g.add((s, snellman.writtenIn, snellman[places[0][0][0].text]))
+            if len(list(places[0])) == 1:
+                g.add((s, snellman.writtenIn, snellman[places[0][0][0].text]))
         return g
     elif get_type(g, s) == "Virkakirje" or "Yksityiskirje":
             if (no_dig_title[len(no_dig_title) - 1] == 'a' or no_dig_title[len(no_dig_title) - 1] == 'ä') \
@@ -135,7 +139,7 @@ def set_correspondent(g, elem, s):
 
 def add_content(g, elem, s, g_content, id):
     content = elem.find('field_suomi')
-    c_resource = snellman['content/c' + id]
+    c_resource = snellman['c' + id]
     if len(list(content)):
         g.add((s, snellman.hasContent, c_resource))
         g_content.add((c_resource, namespace.RDF.type, snellman.Content))
@@ -178,7 +182,7 @@ def add_document_to_graph(g, elem, g_content):
 
 
 def add_matrikkeli(g_content, elem):
-    resource = snellman['content/m' + elem.find('nid').text]
+    resource = snellman['m' + elem.find('nid').text]
     g_content.add((resource, namespace.RDF.type, snellman.Material))
     g_content.add((resource, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
     content = elem.find('body')[0][0][0]
@@ -193,7 +197,7 @@ def add_matrikkeli(g_content, elem):
 
 
 def add_picture(g_content, elem):
-    resource = snellman['content/pic' + elem.find('nid').text]
+    resource = snellman['pic' + elem.find('nid').text]
     g_content.add((resource, namespace.RDF.type, snellman.Material))
     g_content.add((resource, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
     g_content.add((resource, snellman.materialType, Literal('kuvalahde')))
@@ -203,7 +207,7 @@ def add_picture(g_content, elem):
 
 
 def add_kirjallisuutta(g_content, elem):
-    resource = snellman['content/m' + elem.find('nid').text]
+    resource = snellman['m' + elem.find('nid').text]
     g_content.add((resource, namespace.RDF.type, snellman.Material))
     g_content.add((resource, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
     g_content.add((resource, snellman.materialType, Literal('kirjallisuutta')))
@@ -218,7 +222,7 @@ def add_kirjallisuutta(g_content, elem):
 
 
 def add_kirjan_luku(g_content, elem):
-    resource = snellman['content/m' + elem.find('nid').text]
+    resource = snellman['m' + elem.find('nid').text]
     g_content.add((resource, namespace.RDF.type, snellman.Material))
     g_content.add((resource, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
     g_content.add((resource, dc.type, Literal('kirjan_luku')))
@@ -240,7 +244,7 @@ def add_kirjan_luku(g_content, elem):
 
 # Adds this and some others: http://snellman.kootutteokset.fi/fi/node/6846
 def add_secondary_info(g_content, elem):
-    resource = snellman['content/m' + elem.find('nid').text]
+    resource = snellman['m' + elem.find('nid').text]
     g_content.add((resource, namespace.RDF.type, snellman.Material))
     g_content.add((resource, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
     g_content.add((resource, dc.type, Literal('tietoa')))
