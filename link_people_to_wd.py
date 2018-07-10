@@ -1,7 +1,7 @@
-from rdflib import Graph,namespace, URIRef
+from rdflib import Graph,namespace, URIRef, namespace, Namespace
 import requests
 
-
+snellman = Namespace('http://ldf.fi/snellman/')
 
 def link_people_wd(g):
     q = '''
@@ -38,7 +38,7 @@ def link_people_wd(g):
                           data={'query': q})
     
     for row in response.json()['results']['bindings']:
-        g.add((URIRef(row['henkilo']['value']), namespace.SKOS.exactMatch, URIRef(row['human']['value'])))
+        g.add((URIRef(row['henkilo']['value']), snellman.wikidata, URIRef(row['human']['value'])))
 
               
 def link_people_wd_prefLabel(g):
@@ -75,11 +75,12 @@ def link_people_wd_prefLabel(g):
                           data={'query': q})
     
     for row in response.json()['results']['bindings']:
-        g.add((URIRef(row['henkilo']['value']), namespace.SKOS.exactMatch, URIRef(row['human']['value'])))
+        g.add((URIRef(row['henkilo']['value']), snellman.wikidata, URIRef(row['human']['value'])))
 
 
-g = Graph()
-g.parse('turtle/snellman.ttl', format='turtle')
-link_people_wd(g)
-link_people_wd_prefLabel(g)
-g.serialize('turtle/snellman.ttl', format='turtle')
+graph = Graph()
+graph.bind('', snellman)
+graph.parse('turtle/snellman.ttl', format='turtle')
+link_people_wd(graph)
+link_people_wd_prefLabel(graph)
+graph.serialize('turtle/snellman.ttl', format='turtle')

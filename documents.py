@@ -157,7 +157,7 @@ def add_date_comment(g, elem, s):
 def add_document_to_graph(g, elem, g_content):
     document_id = elem.find('nid').text
 
-    s = snellman[document_id]   # Bad naming, this is used a lot as subject in rdf, but it could be named better
+    s = snellman[document_id]   # Bad naming, this is used a lot as subject in rdf triples, but it could be named better
 
     g.add((s, namespace.RDF.type, snellman.Material))
     g.add((s, snellman.materialType, Literal('tekstilahde')))
@@ -256,24 +256,23 @@ def add_secondary_info(g_content, elem):
     except:
         pass
 
-def add_export(g, g_content):
+def add_export(g, g_content, g_extra):
     for event, elem in ET.iterparse('export.xml', events=("start", "end")):
         if event == 'end':
             if elem.tag == 'node':
                 if elem.find('type').text == 'tekstilahde':
                     g = add_document_to_graph(g, elem, g_content)
                 elif elem.find('type').text == 'matrikkeli':
-                    add_matrikkeli(g_content, elem)
+                    add_matrikkeli(g_extra, elem)
                 elif elem.find('type').text == 'kuvalahde':
-                    add_picture(g_content, elem)
+                    add_picture(g_extra, elem)
                 elif elem.find('type').text == 'kirjallisuutta':
-                    add_kirjallisuutta(g_content, elem)
+                    add_kirjallisuutta(g_extra, elem)
                 elif elem.find('type').text == 'kirjan_luku':
-                    add_kirjan_luku(g_content, elem)
+                    add_kirjan_luku(g_extra, elem)
                 elif elem.find('type').text == 'secondary_highlights':
-                    add_secondary_info(g_content, elem)
+                    add_secondary_info(g_extra, elem)
                     #print(ET.tostring(elem, encoding='utf8', method='xml'))
                 #else:
                 #    print(elem.find('type').text)
-    return g
 

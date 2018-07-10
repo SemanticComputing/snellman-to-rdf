@@ -2,6 +2,7 @@ from rdflib import Graph,namespace, URIRef
 import csv
 import re
 import requests
+import xml.etree.ElementTree as ET
 
 def get_wikidata_csv():
     q = '''
@@ -9,19 +10,22 @@ def get_wikidata_csv():
         PREFIX wdt: <http://www.wikidata.org/prop/direct/>
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-        SELECT DISTINCT ?human ?nimiFI ?nimiSV (year(?wdbdate) as ?birthYear)
+        SELECT DISTINCT ?human ?nimiFI ?nimiSV ?birthYear
         WHERE {
             ?human wdt:P31 wd:Q5 .
+            ?human wdt:P569 ?wdbdate .
+            BIND(year(?wdbdate) as ?birthYear) .
             ?human rdfs:label ?nimiFI .
             ?human rdfs:label ?nimiSV .
-            ?human wdt:P569 ?wdbdate .
             FILTER(lang(?nimiFI) = 'fi') . 
             FILTER(lang(?nimiSV) = 'sv') .
         }
+        limit 10
+        format=json
         '''
 
     response = requests.post('https://query.wikidata.org/sparql',
-                             data={'query': q, 'format': 'json'})
+                             data={'query': q})
 
     person_file = open('graphs/wd_people.csv', 'w')
 

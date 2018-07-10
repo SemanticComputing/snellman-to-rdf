@@ -15,7 +15,7 @@ def link_to_yso(g, concept_g, s, concept):
             """, initBindings={'label': concept})
     if len(list(q)) > 0:
         for row in q:
-            g.add((s, namespace.SKOS.exactMatch, URIRef(row[0])))
+            g.add((s, snellman.yso, URIRef(row[0])))
         return True
     else:
         return False
@@ -29,7 +29,7 @@ def link_to_yso_alt(g, concept_g, s, concept):
             """, initBindings={'label': concept})
     if len(list(q)) > 0:
         for row in q:
-            g.add((s, namespace.SKOS.exactMatch, URIRef(row[0])))
+            g.add((s, snellman.yso, URIRef(row[0])))
         return True
     else:
         return False

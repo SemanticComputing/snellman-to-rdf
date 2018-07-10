@@ -234,6 +234,6 @@ g.parse('turtle/snellman.ttl', format='turtle')
 #find_snellman_people()
 
 nbf_from_csv(g)
-link_places(g)
+#link_places(g)
 
 g.serialize('turtle/snellman.ttl', format='turtle')

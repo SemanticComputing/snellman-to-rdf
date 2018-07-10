@@ -72,7 +72,7 @@ def link_to_yso(g, place_g, s, place, language):
                 """, initBindings={'label': location})
         if len(list(q)) > 0:
             for row in q:
-                g.add((s, namespace.SKOS.exactMatch, URIRef(row[0])))
+                g.add((s, snellman.yso, URIRef(row[0])))
             return True
         else:
             return False
@@ -86,7 +86,7 @@ def link_by_altLabel(g, place_g, s, place, language):
             """, initBindings={'label': location})
     if len(list(q)) > 0:
         for row in q:
-            g.add((s, namespace.SKOS.exactMatch, URIRef(row[0])))
+            g.add((s, snellman.yso, URIRef(row[0])))
         return True
     else:
         return False
@@ -102,17 +102,17 @@ def manual_links(g):
     g.add((snellman['13330'], namespace.SKOS.broader, snellman['13326'])) # Kuusilahti -> Siilinjärvi
     g.add((snellman['13325'], namespace.SKOS.broader, snellman['13326'])) # Kuuslahti -> Siilinjärvi
     g.add((snellman['13701'], namespace.SKOS.broader, snellman['13261'])) # Bosgård -> Porvoo
-    g.add((snellman['13531'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q748559'))) #Strömstad
-    g.add((snellman['13581'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q2966'))) # Heidelberg
-    g.add((snellman['13478'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q25413'))) # Linköping
+    #g.add((snellman['13531'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q748559'))) #Strömstad
+    #g.add((snellman['13581'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q2966'))) # Heidelberg
+    #g.add((snellman['13478'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q25413'))) # Linköping
     g.add((snellman['13642'], namespace.SKOS.broader, snellman['13643'])) # Ratula -> Artjärvi
-    g.add((snellman['13318'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q146342'))) # Teplitz
-    g.add((snellman['13333'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q21885987'))) # Hull
-    g.add((snellman['13447'], namespace.SKOS.exactMatch, URIRef('http://www.yso.fi/onto/yso/p94109'))) # Vuojoki -> Eurajoki
-    g.add((snellman['13860'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q3852'))) # Worms
-    g.add((snellman['13559'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q3806'))) # Tübingen
-    g.add((snellman['13303'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q167668'))) # Libau
-    g.add((snellman['13804'], namespace.SKOS.broader, URIRef('http://www.yso.fi/onto/yso/p94210'))) # Danskarby -> Kirkkonummi
+    #g.add((snellman['13318'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q146342'))) # Teplitz
+    #g.add((snellman['13333'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q21885987'))) # Hull
+    g.add((snellman['13447'], snellman.yso, URIRef('http://www.yso.fi/onto/yso/p94109'))) # Vuojoki -> Eurajoki
+    #g.add((snellman['13860'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q3852'))) # Worms
+    #g.add((snellman['13559'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q3806'))) # Tübingen
+    #g.add((snellman['13303'], namespace.SKOS.exactMatch, URIRef('https://www.wikidata.org/wiki/Q167668'))) # Libau
+    g.add((snellman['13804'], snellman.yso, URIRef('http://www.yso.fi/onto/yso/p94210'))) # Danskarby -> Kirkkonummi
     g.add((snellman['13655'], namespace.SKOS.broader, snellman['13261'])) # kroksnäs -> Porvoo
     # Vjasnik kaupunki Vladimirin kuvermentissä ei löydy
     # Mattila ???
@@ -141,7 +141,7 @@ def link_places(g):
             pass
         else:
             link_by_altLabel(g, yso_g, s, row[1], 'fi')
-    link_places_to_wd(g)
+    #link_places_to_wd(g)
     manual_links(g)
 
 
