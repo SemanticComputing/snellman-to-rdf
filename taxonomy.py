@@ -10,6 +10,7 @@ import personal_info
 snellman = Namespace('http://ldf.fi/snellman/')
 dbo = Namespace('http://dbpedia.org/ontology/')
 dc = Namespace('http://purl.org/dc/elements/1.1/')
+schema = Namespace('http://schema.org/')
 
 
 # Methods for the csv-files
@@ -30,7 +31,7 @@ def add_luvut_csv(g):
     csv_reader = csv.reader(open('taxonomy/taxocsv_13.csv', 'r'))
     for row in csv_reader:
         resource = snellman[row[0]]
-        g.add((resource, namespace.RDF.type, snellman.chapter))
+        g.add((resource, namespace.RDF.type, snellman.Chapter))
         g.add((resource, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
     return g
 
@@ -48,7 +49,7 @@ def add_kirjat_csv(g):
 
 def add_aiheet_csv(g):
     g.add((snellman.subject, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.subject, namespace.SKOS.prefLabel, Literal('Aihe', lang='fi')))
+    g.add((snellman.subject, namespace.SKOS.prefLabel, Literal('Asia', lang='fi')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_5.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]
@@ -84,7 +85,7 @@ def add_snellman(g):
 def add_paikat_csv(g):
     g.add((snellman.place, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.place, namespace.SKOS.prefLabel, Literal('Paikka', lang='fi')))
-    g.add((snellman.place, namespace.SKOS.exactMatch, dbo.Place))
+    g.add((snellman.place, namespace.RDFS.subClassOf, schema.Place))
     csv_reader = csv.reader(open('taxonomy/taxocsv_4.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]

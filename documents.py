@@ -16,7 +16,7 @@ def add_people(g, elem, s):
     people = elem.find('field_henkilot')
     if len(list(people)):
         for resource in people[0]:
-            g.add((s, snellman.relatedPerson, snellman[resource[0].text]))
+            g.add((s, dc.relation, snellman[resource[0].text]))
     return g
 
 
@@ -24,7 +24,7 @@ def add_places(g, elem, s):
     places = elem.find('field_paikat')
     if len(list(places)):
         for resource in places[0]:
-            g.add((s, snellman.relatedPlace, snellman[resource[0].text]))
+            g.add((s, dc.relation, snellman[resource[0].text]))
     return g
 
 
@@ -32,14 +32,14 @@ def add_concepts(g, elem, s):
     concepts = elem.find('field_asiat')
     if len(list(concepts)):
         for subject in concepts[0]:
-            g.add((s, dc.subject, snellman[subject[0].text]))
+            g.add((s, dc.relation, snellman[subject[0].text]))
     return g
 
 def add_terms(g, elem, s):
     terms = elem.find('field_termit')
     if len(list(terms)):
         for term in terms[0]:
-            g.add((s, dc.subject, snellman[term[0].text]))
+            g.add((s, dc.relation, snellman[term[0].text]))
     return g
 
 
@@ -91,13 +91,28 @@ def add_creator(g, elem, s):
     g.add((s, dc.creator, snellman['1']))
     return g
 
+# adds letter sender and receiver
 
 def add_letter_sender(g, elem, s):
     no_dig_title = remove_extra(elem.find('title').text.split(',')[0])
+    correspondent = get_correspondent(g, elem)
     if (no_dig_title[len(no_dig_title) - 1] == 'a' or no_dig_title[len(no_dig_title) - 1] == 'ä') and (no_dig_title[len(no_dig_title) - 2] == 't'):
-        set_correspondent(g, elem, s)
+        if correspondent:
+            g.add((s, dc.creator, URIRef(correspondent)))
+
+        # Following adds creators for some letters in a risky way that may cause mistakes
+        # The first person in field_henkilöt is a likely creator of the letter, but this could be done better
+        else:
+            people = elem.find('field_henkilot')
+            if len(list(people)):
+                g.add((s, dc.creator, snellman[people[0][0][0].text]))
+
+        g.add((s, snellman.letterReceiver, snellman['1']))
+
     else:
         g.add((s, dc.creator, snellman['1']))
+        if correspondent:
+            g.add((s, snellman.letterReceiver, URIRef(correspondent)))
 
 # type needs to be defined in graph before this is called...
 def get_type(g, s):
@@ -116,7 +131,7 @@ def get_type(g, s):
         return row[0]
 
 
-def set_correspondent(g, elem, s):
+def get_correspondent(g, elem):
     correspondent = elem.find('field_kirjeenvaihto')[0][0][0].text
     q = g.query("""
             PREFIX snell: <http://ldf.fi/snellman/>
@@ -129,13 +144,9 @@ def set_correspondent(g, elem, s):
             """, initBindings={'correspondent': snellman[correspondent]})
     if len(list(q)) > 0:
         for row in q:
-            g.add((s, dc.creator, URIRef(row[0])))
-    # Following adds creators for some letters in a risky way that may cause mistakes
-    # The first person in field_henkilöt is a likely creator of the letter, but this could be done better
+            return row[0]
     else:
-        people = elem.find('field_henkilot')
-        if len(list(people)):
-            g.add((s, dc.creator, snellman[people[0][0][0].text]))
+        return False
 
 def add_content(g, elem, s, g_content, id):
     content = elem.find('field_suomi')

@@ -7,6 +7,7 @@ import correspondence
 snellman = Namespace('http://ldf.fi/snellman/')
 dbo = Namespace('http://dbpedia.org/ontology/')
 dc = Namespace('http://purl.org/dc/elements/1.1/')
+schema = Namespace('http://schema.org/')
 
 graph = Graph()
 content_graph = Graph()
@@ -33,6 +34,7 @@ def add_basic_schema(g):
     g.add((snellman.document, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.document, namespace.SKOS.prefLabel, Literal('Document', lang='en')))
     g.add((snellman.document, namespace.SKOS.prefLabel, Literal('Dokumentti, tekstilähde', lang='fi')))
+    g.add((snellman.document, namespace.RDFS.subClassOf, schema.CreativeWork))
 
     g.add((snellman.content, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.content, namespace.SKOS.prefLabel, Literal('Resource for document content', lang='en')))
@@ -77,9 +79,12 @@ def add_basic_schema(g):
 
     g.add((snellman.writtenIn, namespace.RDF.type, namespace.RDF.Property))
     g.add((snellman.writtenIn, namespace.SKOS.prefLabel, Literal('Place where the text was propably written', lang='en')))
-    g.add(
-        (snellman.writtenIn, namespace.SKOS.prefLabel, Literal('Tekstin todennäköinen kirjoituspaikka', lang='fi')))
+    g.add((snellman.writtenIn, namespace.SKOS.prefLabel, Literal('Tekstin todennäköinen kirjoituspaikka', lang='fi')))
     g.add((snellman.writtenIn, namespace.RDFS.subPropertyOf, dc.relation))
+
+    g.add((snellman.letterReceiver, namespace.RDF.type, namespace.RDF.Property))
+    g.add((snellman.letterReceiver, namespace.SKOS.prefLabel, Literal('Kirjeen vastaanottaja', lang='fi')))
+    g.add((snellman.letterReceiver, namespace.RDFS.subPropertyOf, dc.relation))
 
     g.add((snellman.nbf, namespace.RDF.type, namespace.RDF.Property))
     g.add((snellman.nbf, namespace.RDFS.subPropertyOf, namespace.SKOS.exactMatch))
