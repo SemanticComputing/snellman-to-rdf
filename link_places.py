@@ -73,11 +73,13 @@ def link_to_yso(g, place_g, s, place, language):
                 """, initBindings={'label': location})
         if len(list(q)) > 0:
             for row in q:
-                g.add((s, namespace.OWL.sameAs, URIRef(row[0])))
+                g.add((s, snellman.yso, URIRef(row[0])))
+
                 try:
                     g.add((s, namespace.SKOS.broadMatch, URIRef(row[1])))
                 except:
                     pass
+
             return True
         else:
             return False
@@ -92,11 +94,13 @@ def link_by_altLabel(g, place_g, s, place, language):
             """, initBindings={'label': location})
     if len(list(q)) > 0:
         for row in q:
-            g.add((s, namespace.OWL.sameAs, URIRef(row[0])))
+            g.add((s, snellman.yso, URIRef(row[0])))
+
             try:
                 g.add((s, namespace.SKOS.broadMatch, URIRef(row[1])))
             except:
                 pass
+
         return True
     else:
         return False
@@ -182,6 +186,26 @@ def manual_links(g):
     g.add((URIRef('http://ldf.fi/snellman/13354'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94439')))  # Denmark
 
     g.add((URIRef('http://ldf.fi/snellman/13303'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94259'))) # Latvia
+
+
+
+    # fixes
+
+    g.remove((URIRef('http://ldf.fi/snellman/13679'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94304'))) # SSSR
+
+    g.remove((URIRef('http://ldf.fi/snellman/13307'), namespace.SKOS.broadMatch, None)) # Königsberg from russia to germany
+    g.add((URIRef('http://ldf.fi/snellman/13307'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p105087')))
+
+    g.remove((URIRef('http://ldf.fi/snellman/13726'), namespace.SKOS.broadMatch, None)) # Malminkartano
+    g.add((URIRef('http://ldf.fi/snellman/13726'), namespace.SKOS.broadMatch, URIRef('http://ldf.fi/snellman/13242')))
+
+    g.add((URIRef('http://ldf.fi/snellman/13263'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94426'))) # Viipuri
+
+    g.add((URIRef('http://ldf.fi/snellman/13661'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94426'))) # Sortavala
+
+
+
+
 
 
 
