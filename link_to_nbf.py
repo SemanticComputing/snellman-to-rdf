@@ -2,6 +2,7 @@ from rdflib import Graph,namespace, Namespace, URIRef
 import requests
 import json
 import csv
+import re
 
 snellman = Namespace('http://ldf.fi/snellman/')
 
@@ -188,10 +189,12 @@ def nbf_from_csv(g):
         if index >= 0:
             x=0
             while nbf_birth_list[index] <= int(row[1]):
-                #print(index)
-                #print(nbf_first_name_list[index])
-                if row[2] == nbf_family_name_list[index] and row[3] == nbf_first_name_list[index]:
+                snellman_name = re.sub('(.*?)', '', (row[3] + row[2])).strip()
+                nbf_name = re.sub('(.*?)', '', (nbf_first_name_list[index] + nbf_family_name_list[index])).strip()
+                if (row[2] == nbf_family_name_list[index] and row[3] == nbf_first_name_list[index]) \
+                        or (nbf_name == snellman_name):
                     g.add((URIRef(row[0]), snellman.nbf, URIRef(nbf_uri_list[index])))
+
                 index = index + 1
 
 def link_places(g):
