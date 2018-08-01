@@ -73,7 +73,7 @@ def link_to_yso(g, place_g, s, place, language):
                 """, initBindings={'label': location})
         if len(list(q)) > 0:
             for row in q:
-                g.add((s, snellman.yso, URIRef(row[0])))
+                g.add((s, namespace.OWL.sameAs, URIRef(row[0])))
                 try:
                     g.add((s, namespace.SKOS.broadMatch, URIRef(row[1])))
                 except:
@@ -92,7 +92,7 @@ def link_by_altLabel(g, place_g, s, place, language):
             """, initBindings={'label': location})
     if len(list(q)) > 0:
         for row in q:
-            g.add((s, snellman.yso, URIRef(row[0])))
+            g.add((s, namespace.OWL.sameAs, URIRef(row[0])))
             try:
                 g.add((s, namespace.SKOS.broadMatch, URIRef(row[1])))
             except:
@@ -136,6 +136,55 @@ def manual_links(g):
     # g.add((snellman['13221'], namespace.SKOS.closeMatch, URIRef('https://finto.fi/yso-paikat/fi/page/p94083'))) #Palo tässä ilmeisesti Alahärmän kylä (?)
     # g.add((snellman['13353'], namespace.SKOS.closeMatch, snellman['13221'])) # Alahärmä -> Palo
     # g.add((snellman['13221'], namespace.SKOS.closeMatch, snellman['13353'])) # Palo -> Alahärmä
+
+
+    # Rough broadmatch to countries
+
+
+    g.add((URIRef('http://ldf.fi/snellman/13392'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94426'))) #suomi
+    g.add((URIRef('http://ldf.fi/snellman/13340'), namespace.SKOS.broadMatch,URIRef('http://www.yso.fi/onto/yso/p94426')))  # suomi
+    g.add((URIRef('http://ldf.fi/snellman/13645'), namespace.SKOS.broadMatch,URIRef('http://www.yso.fi/onto/yso/p94426')))  # suomi
+    g.add((URIRef('http://ldf.fi/snellman/13376'), namespace.SKOS.broadMatch,
+           URIRef('http://www.yso.fi/onto/yso/p94426')))  # suomi
+    g.add((URIRef('http://ldf.fi/snellman/13443'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94426'))) #suomi
+
+    g.add((URIRef('http://ldf.fi/snellman/13315'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p105087'))) # germany
+    g.add((URIRef('http://ldf.fi/snellman/13316'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p105087')))
+    g.add((URIRef('http://ldf.fi/snellman/13559'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p105087')))
+    g.add((URIRef('http://ldf.fi/snellman/13860'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p105087')))
+    g.add((URIRef('http://ldf.fi/snellman/13580'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p105087')))
+    g.add((URIRef('http://ldf.fi/snellman/13581'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p105087')))
+    g.add((URIRef('http://ldf.fi/snellman/13314'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p105087')))
+    g.add((URIRef('http://ldf.fi/snellman/13302'), namespace.SKOS.broadMatch,
+           URIRef('http://www.yso.fi/onto/yso/p105087')))
+
+    g.add((URIRef('http://ldf.fi/snellman/13275'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94479'))) # Russia
+    g.add((URIRef('http://ldf.fi/snellman/13385'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94479')))
+    g.add((URIRef('http://ldf.fi/snellman/13611'), namespace.SKOS.broadMatch,
+           URIRef('http://www.yso.fi/onto/yso/p94479')))
+
+    g.add((URIRef('http://ldf.fi/snellman/13531'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94383'))) #Sweden
+    g.add((URIRef('http://ldf.fi/snellman/13478'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94383')))
+    g.add((URIRef('http://ldf.fi/snellman/13487'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94383')))
+    g.add((URIRef('http://ldf.fi/snellman/13663'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94383')))
+
+    g.add((URIRef('http://ldf.fi/snellman/13370'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p104990'))) # UK
+    g.add((URIRef('http://ldf.fi/snellman/13333'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p104990')))
+
+    g.add((URIRef('http://ldf.fi/snellman/13329'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p104968'))) # Ranska
+
+    g.add((URIRef('http://ldf.fi/snellman/13304'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94268'))) # Lithuania
+
+    g.add((URIRef('http://ldf.fi/snellman/13318'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p107480'))) # Tsekki
+
+    g.add((URIRef('http://ldf.fi/snellman/13317'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p105206'))) # Belgium
+
+    g.add((URIRef('http://ldf.fi/snellman/13354'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94439')))  # Denmark
+
+    g.add((URIRef('http://ldf.fi/snellman/13303'), namespace.SKOS.broadMatch, URIRef('http://www.yso.fi/onto/yso/p94259'))) # Latvia
+
+
+
 
 def link_places(g):
     csv_reader = csv.reader(open('taxonomy/taxocsv_4.csv', 'r'))
