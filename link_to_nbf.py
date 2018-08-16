@@ -189,8 +189,9 @@ def nbf_from_csv(g):
         if index >= 0:
             x=0
             while nbf_birth_list[index] <= int(row[1]):
-                snellman_name = re.sub('(.*?)', '', (row[3] + row[2])).strip()
-                nbf_name = re.sub('(.*?)', '', (nbf_first_name_list[index] + nbf_family_name_list[index])).strip()
+                snellman_name = re.sub('(.*?)', '', (row[3] + row[2])).strip().replace(" ", "")
+                nbf_name = re.sub('(.*?)', '', (nbf_first_name_list[index] + nbf_family_name_list[index])).strip().replace(" ", "")
+                print(nbf_name + '   ' + snellman_name)
                 if (row[2] == nbf_family_name_list[index] and row[3] == nbf_first_name_list[index]) \
                         or (nbf_name == snellman_name):
                     g.add((URIRef(row[0]), snellman.nbf, URIRef(nbf_uri_list[index])))

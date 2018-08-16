@@ -33,7 +33,7 @@ extra_graph.bind('dc', dc)
 def add_basic_schema(g):
     g.add((snellman.document, namespace.RDF.type, namespace.RDFS.Class))
     g.add((snellman.document, namespace.SKOS.prefLabel, Literal('Document', lang='en')))
-    g.add((snellman.document, namespace.SKOS.prefLabel, Literal('Dokumentti, tekstilähde', lang='fi')))
+    g.add((snellman.document, namespace.SKOS.prefLabel, Literal('J. V. Snellmanin teosten tekstilähde', lang='fi')))
     g.add((snellman.document, namespace.RDFS.subClassOf, schema.CreativeWork))
 
     g.add((snellman.content, namespace.RDF.type, namespace.RDFS.Class))
@@ -117,7 +117,7 @@ def add_basic_schema(g):
 
 
 add_basic_schema(graph)
-taxonomy.add_aiheet_csv(graph)
+taxonomy.add_asiat_csv(graph)
 taxonomy.add_henkilot_csv(graph)
 taxonomy.add_paikat_csv(graph)
 #taxonomy.add_kirjeenvaihto_csv(graph)

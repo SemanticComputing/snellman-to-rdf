@@ -47,13 +47,13 @@ def add_kirjat_csv(g):
     return g
 
 
-def add_aiheet_csv(g):
-    g.add((snellman.subject, namespace.RDF.type, namespace.RDFS.Class))
-    g.add((snellman.subject, namespace.SKOS.prefLabel, Literal('Asia', lang='fi')))
+def add_asiat_csv(g):
+    g.add((snellman.abstractConcept, namespace.RDF.type, namespace.RDFS.Class))
+    g.add((snellman.abstractConcept, namespace.SKOS.prefLabel, Literal('Asia', lang='fi')))
     csv_reader = csv.reader(open('taxonomy/taxocsv_5.csv', 'r'))
     for row in csv_reader:
         s = snellman[row[0]]
-        g.add((s, namespace.RDF.type, snellman.Subject))
+        g.add((s, namespace.RDF.type, snellman.AbstractConcept))
         g.add((s, namespace.SKOS.prefLabel, Literal(row[1], lang='fi')))
     return g
 

@@ -102,10 +102,10 @@ def add_letter_sender(g, elem, s):
 
         # Following adds creators for some letters in a risky way that may cause mistakes
         # The first person in field_henkilöt is a likely creator of the letter, but this could be done better
-        else:
-            people = elem.find('field_henkilot')
-            if len(list(people)):
-                g.add((s, dc.creator, snellman[people[0][0][0].text]))
+        #else:
+        #    people = elem.find('field_henkilot')
+        #    if len(list(people)):
+        #        g.add((s, dc.creator, snellman[people[0][0][0].text]))
 
         g.add((s, snellman.letterReceiver, snellman['1']))
 
@@ -168,13 +168,15 @@ def add_date_comment(g, elem, s):
 def add_document_to_graph(g, elem, g_content):
     document_id = elem.find('nid').text
 
-    s = snellman[document_id]   # Bad naming, this is used a lot as subject in rdf triples, but it could be named better
+    s = snellman[document_id]   # Bad naming for s, this is used a lot as subject in rdf triples, but it could be named better
 
     g.add((s, namespace.RDF.type, snellman.Material))
     g.add((s, snellman.materialType, Literal('tekstilahde')))
 
     g.add((s, namespace.RDF.type, snellman.Document))
     g.add((s, namespace.SKOS.prefLabel, Literal(elem.find('title').text)))
+
+    g.add((s, namespace.RDF.type, namespace.FOAF.Document))
 
     path = elem.find('path')
     g.add((s, dc.source, URIRef('http://snellman.kootutteokset.fi/fi/{}'.format(path.find('alias').text))))
