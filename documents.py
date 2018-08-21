@@ -4,6 +4,7 @@ import re
 from rdflib import Graph, Literal, namespace, Namespace, XSD, URIRef
 from bs4 import BeautifulSoup
 from string import digits
+import bio_to_documents
 
 snellman = Namespace('http://ldf.fi/snellman/')
 dbo = Namespace('http://dbpedia.org/ontology/')
@@ -63,7 +64,7 @@ def add_correspondence(g, elem, s):
     return g
 
 
-# Adding some extra properties to the letters. Unfinished...
+# Adding some extra properties to the letters
 
 def remove_extra(s):
     answer = []
@@ -96,16 +97,10 @@ def add_creator(g, elem, s):
 def add_letter_sender(g, elem, s):
     no_dig_title = remove_extra(elem.find('title').text.split(',')[0])
     correspondent = get_correspondent(g, elem)
+
     if (no_dig_title[len(no_dig_title) - 1] == 'a' or no_dig_title[len(no_dig_title) - 1] == 'ä') and (no_dig_title[len(no_dig_title) - 2] == 't'):
         if correspondent:
             g.add((s, dc.creator, URIRef(correspondent)))
-
-        # Following adds creators for some letters in a risky way that may cause mistakes
-        # The first person in field_henkilöt is a likely creator of the letter, but this could be done better
-        #else:
-        #    people = elem.find('field_henkilot')
-        #    if len(list(people)):
-        #        g.add((s, dc.creator, snellman[people[0][0][0].text]))
 
         g.add((s, snellman.letterReceiver, snellman['1']))
 
@@ -165,7 +160,7 @@ def add_date_comment(g, elem, s):
     return g
 
 
-def add_document_to_graph(g, elem, g_content):
+def add_document_to_graph(g, elem, g_content, b_list):
     document_id = elem.find('nid').text
 
     s = snellman[document_id]   # Bad naming for s, this is used a lot as subject in rdf triples, but it could be named better
@@ -190,9 +185,26 @@ def add_document_to_graph(g, elem, g_content):
     g = add_creator(g, elem, s)
     g = add_content(g, elem, s, g_content, document_id)
     g = add_correspondence(g, elem, s)
+    g = add_related_bio(g, elem, s, b_list)
     return g
 
+def add_related_bio(g, elem, s, b_list):
+    time = elem.find('field_date')
+    if len(list(time)):
+        date = time[0][0][0].text[:10]
+        year, month, day = date.split('-')
+        for row in b_list:
+            if int(year) > int(row[1]) and int(year) < int(row[3]):
+                add_bio_link_to_graph(g, elem, s, row[0])
+            elif (row[1] != row[3]) and (int(year) == int(row[1]) and int(month) >= int(row[2])):
+                add_bio_link_to_graph(g, elem, s, row[0])
+            elif int(year) == int(row[3]) and int(month) <= int(row[4]):
+                add_bio_link_to_graph(g, elem, s, row[0])
+    return g
 
+def add_bio_link_to_graph(g, elem, s, alias):
+    g.add((s, namespace.RDFS.seeAlso, URIRef('http://snellman.kootutteokset.fi' + alias)))
+    g.add((s, snellman.relatedBio, snellman['m' + elem.find('nid').text]))
 
 def add_matrikkeli(g_content, elem):
     resource = snellman['m' + elem.find('nid').text]
@@ -270,11 +282,13 @@ def add_secondary_info(g_content, elem):
         pass
 
 def add_export(g, g_content, g_extra):
+    bio_list = []
+    bio_to_documents.make_table(bio_list)
     for event, elem in ET.iterparse('export.xml', events=("start", "end")):
         if event == 'end':
             if elem.tag == 'node':
                 if elem.find('type').text == 'tekstilahde':
-                    g = add_document_to_graph(g, elem, g_content)
+                    g = add_document_to_graph(g, elem, g_content, bio_list)
                 elif elem.find('type').text == 'matrikkeli':
                     add_matrikkeli(g_extra, elem)
                 elif elem.find('type').text == 'kuvalahde':
