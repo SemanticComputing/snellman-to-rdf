@@ -89,7 +89,8 @@ def add_creator(g, elem, s):
             if (no_dig_title[len(no_dig_title) - 1] == 'a' or no_dig_title[len(no_dig_title) - 1] == 'ä') \
                     and no_dig_title[len(no_dig_title) - 2] == 't':
                 return g
-    g.add((s, dc.creator, snellman['1']))
+    else:
+        g.add((s, dc.creator, snellman['1']))
     return g
 
 # adds letter sender and receiver
@@ -196,14 +197,17 @@ def add_related_bio(g, elem, s, b_list):
         for row in b_list:
             if int(year) > int(row[1]) and int(year) < int(row[3]):
                 add_bio_link_to_graph(g, elem, s, row[0])
+                return g
             elif (row[1] != row[3]) and (int(year) == int(row[1]) and int(month) >= int(row[2])):
                 add_bio_link_to_graph(g, elem, s, row[0])
+                return g
             elif int(year) == int(row[3]) and int(month) <= int(row[4]):
                 add_bio_link_to_graph(g, elem, s, row[0])
+                return g
     return g
 
 def add_bio_link_to_graph(g, elem, s, alias):
-    g.add((s, namespace.RDFS.seeAlso, URIRef('http://snellman.kootutteokset.fi' + alias)))
+    g.add((s, namespace.RDFS.seeAlso, URIRef('http://snellman.kootutteokset.fi/' + alias)))
     g.add((s, snellman.relatedBio, snellman['m' + elem.find('nid').text]))
 
 def add_matrikkeli(g_content, elem):
