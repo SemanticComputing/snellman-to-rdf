@@ -101,17 +101,18 @@ def add_basic_schema(g):
     g.add((snellman.yso, namespace.SKOS.prefLabel, Literal('Link to YSO resource', lang='en')))
     g.add((snellman.yso, namespace.SKOS.prefLabel, Literal('Siltaus YSO-ontologiaan', lang='fi')))
 
-    g.add((snellman.relatedPlace, namespace.RDF.type, namespace.RDF.Property))
-    g.add((snellman.relatedPlace, namespace.RDFS.subPropertyOf, dc.relation))
-    g.add((snellman.relatedPlace, namespace.SKOS.prefLabel, Literal('Dokumenttiin liittyvä paikka', lang='fi')))
 
-    g.add((snellman.relatedPerson, namespace.RDF.type, namespace.RDF.Property))
-    g.add((snellman.relatedPerson, namespace.RDFS.subPropertyOf, dc.relation))
-    g.add((snellman.relatedPerson, namespace.SKOS.prefLabel, Literal('Dokumenttiin liittyvä henkilö', lang='fi')))
+    #g.add((snellman.relatedPlace, namespace.RDF.type, namespace.RDF.Property))
+    #g.add((snellman.relatedPlace, namespace.RDFS.subPropertyOf, dc.relation))
+    #g.add((snellman.relatedPlace, namespace.SKOS.prefLabel, Literal('Dokumenttiin liittyvä paikka', lang='fi')))
 
-    g.add((snellman.relatedCorrespondence, namespace.RDF.type, namespace.RDF.Property))
-    g.add((snellman.relatedCorrespondence, namespace.RDFS.subPropertyOf, dc.relation))
-    g.add((snellman.relatedCorrespondence, namespace.SKOS.prefLabel, Literal('Dokumenttiin liittyvä kiirjeenvaihto', lang='fi')))
+    #g.add((snellman.relatedPerson, namespace.RDF.type, namespace.RDF.Property))
+    #g.add((snellman.relatedPerson, namespace.RDFS.subPropertyOf, dc.relation))
+    #g.add((snellman.relatedPerson, namespace.SKOS.prefLabel, Literal('Dokumenttiin liittyvä henkilö', lang='fi')))
+
+    #g.add((snellman.relatedCorrespondence, namespace.RDF.type, namespace.RDF.Property))
+    #g.add((snellman.relatedCorrespondence, namespace.RDFS.subPropertyOf, dc.relation))
+    #g.add((snellman.relatedCorrespondence, namespace.SKOS.prefLabel, Literal('Dokumenttiin liittyvä kiirjeenvaihto', lang='fi')))
 
 
 

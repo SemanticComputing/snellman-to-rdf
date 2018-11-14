@@ -108,6 +108,7 @@ def link_by_altLabel(g, place_g, s, place, language):
 
 
 def manual_links(g):
+
     g.add((snellman['13221'], namespace.SKOS.broader, snellman['13353'])) # Palo -> Alahärmä
     g.add((snellman['13638'], namespace.SKOS.broader, snellman['13228'])) # Nikolain -> Vaasa
     # g.add((snellman['13397'], namespace.SKOS.exactMatch, URIRef('http://www.yso.fi/onto/yso/p94148')))

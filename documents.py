@@ -85,12 +85,12 @@ def add_creator(g, elem, s):
             if len(list(places[0])) == 1:
                 g.add((s, snellman.writtenIn, snellman[places[0][0][0].text]))
         return g
-    elif get_type(g, s) == "Virkakirje" or "Yksityiskirje":
-            if (no_dig_title[len(no_dig_title) - 1] == 'a' or no_dig_title[len(no_dig_title) - 1] == 'ä') \
+    if get_type(g, s) == "Virkakirje" or "Yksityiskirje":
+        if (no_dig_title[len(no_dig_title) - 1] == 'a' or no_dig_title[len(no_dig_title) - 1] == 'ä') \
                     and no_dig_title[len(no_dig_title) - 2] == 't':
-                return g
-    else:
-        g.add((s, dc.creator, snellman['1']))
+            return g
+
+    g.add((s, dc.creator, snellman['1']))
     return g
 
 # adds letter sender and receiver
